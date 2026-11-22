@@ -4,6 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Quem está na foto · Detach! 26</title>
+<meta name="description" content="Galeria do Detach! 26 em Fortaleza: clique num rosto e veja só as fotos dessa pessoa.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Quem está na foto · Detach! 26">
+<meta property="og:description" content="1.384 fotos do Detach! 26 em Fortaleza. Clique num rosto e ache as suas.">
+<meta property="og:image" content="https://dpiaia.github.io/detach-pics-26/img/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@125,500..800&family=Fragment+Mono&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -71,11 +79,39 @@
 
   main { padding: 20px 0 64px; }
   .grid { columns: 4 240px; column-gap: 8px; }
-  .ph { break-inside: avoid; margin: 0 0 8px; position: relative; overflow: hidden; background: var(--line); cursor: zoom-in; display: block; width: 100%; padding: 0; border: 0; }
+  .ph { break-inside: avoid; margin: 0 0 8px; position: relative; overflow: hidden; background: var(--line); }
+  .ph .open { display: block; width: 100%; padding: 0; border: 0; background: none; cursor: zoom-in; }
   .ph img { display: block; width: 100%; height: auto; transition: transform .3s; }
   .ph:hover img { transform: scale(1.03); }
   .ph .fn { position: absolute; left: 0; bottom: 0; color: var(--black); background: var(--mint); padding: 3px 8px; opacity: 0; transition: opacity .15s; }
-  .ph:hover .fn, .ph:focus-visible .fn { opacity: 1; }
+  .ph:hover .fn, .ph:focus-within .fn { opacity: 1; }
+  /* ações da foto: aparecem ao passar o mouse; no toque ficam na foto ampliada */
+  .acts { position: absolute; top: 8px; right: 8px; display: flex; gap: 6px; opacity: 0; transform: translateY(-4px); transition: opacity .15s, transform .15s; }
+  .ph:hover .acts, .ph:focus-within .acts { opacity: 1; transform: none; }
+  .act { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border: 2px solid var(--black); background: var(--bg); color: var(--black);
+    text-decoration: none; cursor: pointer; font-family: var(--mono); font-size: 11px; text-transform: uppercase; line-height: 1; }
+  .act svg { width: 14px; height: 14px; flex: none; }
+  .act:hover { background: var(--green); }
+  .act.share:hover { background: var(--lilac); }
+  @media (hover: none) { .acts { display: none; } }
+  .lbbar .act { border-color: #fff; background: var(--black); color: #fff; }
+  .lbbar .act:hover { background: var(--green); border-color: var(--green); color: var(--black); }
+  .lbbar .act.share:hover { background: var(--lilac); border-color: var(--lilac); }
+  .lbacts { display: inline-flex; gap: 8px; }
+  @media (max-width: 700px) {
+    .lbbar { padding-right: 66px; }
+    .lb .x { position: absolute; top: 10px; right: 12px; }
+    .lbacts { position: fixed; left: 16px; right: 16px; bottom: 16px; display: grid; grid-template-columns: 1fr 1fr; }
+    .lbacts .act { justify-content: center; padding: 13px 10px; font-size: 12px; }
+    .hint { display: none; }
+  }
+  .sharemenu { position: fixed; z-index: 40; display: none; min-width: 200px; background: var(--bg); border: 2px solid var(--black); box-shadow: 6px 6px 0 var(--lilac); }
+  .sharemenu.on { display: block; }
+  .sharemenu a, .sharemenu button { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 14px; border: 0; background: none; color: var(--black);
+    text-decoration: none; cursor: pointer; font-family: var(--mono); font-size: 12px; text-transform: uppercase; text-align: left; }
+  .sharemenu a + a, .sharemenu a + button { border-top: 1px solid var(--line); }
+  .sharemenu a:hover, .sharemenu button:hover { background: var(--mint); }
+  .sharemenu .dot { width: 10px; height: 10px; flex: none; }
   .empty { padding: 48px 0; text-align: center; }
   footer { border-top: 2px solid var(--black); padding: 20px 0 28px; color: var(--muted); }
   footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 24px; }
@@ -94,7 +130,7 @@
   .box .tag { position: absolute; left: 0; top: 100%; margin-top: 4px; white-space: nowrap; color: var(--black); background: var(--green);
     padding: 2px 6px; display: none; font-family: var(--mono); font-size: 11px; text-transform: uppercase; }
   .box:hover .tag, .box.hit .tag { display: block; }
-  .lbbar { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 16px; padding: 12px 16px; color: #fff; }
+  .lbbar { position: absolute; top: 0; left: 0; right: 0; z-index: 1; display: flex; align-items: center; gap: 12px 16px; flex-wrap: wrap; padding: 12px 16px; color: #fff; }
   .lbbar a { color: var(--mint); }
   .lbbar .sp { flex: 1; }
   .lb .x, .lb .nav { border: 2px solid #fff; background: var(--black); color: #fff; font-size: 20px; width: 42px; height: 42px; cursor: pointer; }
@@ -190,11 +226,19 @@
 </div>
 
 <div class="lb" id="lb" role="dialog" aria-modal="true">
-  <div class="lbbar"><span id="lbtitle" class="label"></span><a id="lbdrive" class="label" target="_blank" rel="noopener">Abrir no Drive</a><span class="sp"></span><button class="x" id="lbx" aria-label="Fechar">×</button></div>
+  <div class="lbbar"><span id="lbtitle" class="label"></span><a id="lbdrive" class="label" target="_blank" rel="noopener">Abrir no Drive</a><span class="sp"></span><span class="lbacts"><a class="act" id="lbdl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 4v11m0 0l-5-5m5 5l5-5M5 20h14"/></svg> Baixar</a><button class="act share" id="lbshare"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 15V4m0 0L7 9m5-5l5 5M5 13v7h14v-7"/></svg> Compartilhar</button></span><button class="x" id="lbx" aria-label="Fechar">×</button></div>
   <button class="nav prev" id="lbprev" aria-label="Anterior">‹</button>
   <div class="stage" id="stage"><img id="lbimg" alt=""></div>
   <button class="nav next" id="lbnext" aria-label="Próxima">›</button>
   <div class="hint label">Clique num rosto para ver só as fotos dessa pessoa · ← → navegam · Esc fecha</div>
+</div>
+
+<div class="sharemenu" id="sharemenu" role="menu">
+  <a id="sh-wa" target="_blank" rel="noopener" role="menuitem"><span class="dot" style="background:var(--green)"></span>WhatsApp</a>
+  <a id="sh-in" target="_blank" rel="noopener" role="menuitem"><span class="dot" style="background:var(--lilac)"></span>LinkedIn</a>
+  <a id="sh-x" target="_blank" rel="noopener" role="menuitem"><span class="dot" style="background:var(--black)"></span>X</a>
+  <a id="sh-fb" target="_blank" rel="noopener" role="menuitem"><span class="dot" style="background:var(--orange)"></span>Facebook</a>
+  <button id="sh-copy" role="menuitem"><span class="dot" style="background:var(--pink)"></span><span>Copiar link</span></button>
 </div>
 
 <script src="data.js"></script>
@@ -218,6 +262,47 @@ const tick = ["Detach! 26", "Fortaleza", "20, 21 e 22 de novembro", `${fmt(photo
 $("ticker").innerHTML = [...tick, ...tick, ...tick, ...tick].map((t) => `<span>${t}</span>`).join("");
 // a barra é sticky; a posição natural dela é logo abaixo da faixa de números
 const toGallery = () => { const st = document.querySelector(".stats"); const y = st.offsetTop + st.offsetHeight; if (window.scrollY > y) window.scrollTo({ top: y }); };
+
+const ICON_DL = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 4v11m0 0l-5-5m5 5l5-5M5 20h14"/></svg>`;
+const ICON_SH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 15V4m0 0L7 9m5-5l5 5M5 13v7h14v-7"/></svg>`;
+// download direto da original no Drive (o Drive responde com "attachment")
+const dlUrl = (p) => `https://drive.usercontent.google.com/download?id=${p.id}&export=download`;
+const photoUrl = (p) => `${location.origin}${location.pathname}#foto=${p.id}`;
+const SHARE_TEXT = "Olha essa foto do Detach! 26 📸";
+
+function share(p, anchor) {
+  const url = photoUrl(p);
+  // no celular, abre a folha de compartilhamento do sistema
+  if (navigator.share && matchMedia("(pointer: coarse)").matches) {
+    navigator.share({ title: "Detach! 26", text: SHARE_TEXT, url }).catch(() => {});
+    return;
+  }
+  const m = $("sharemenu"), enc = encodeURIComponent;
+  $("sh-wa").href = `https://wa.me/?text=${enc(SHARE_TEXT + " " + url)}`;
+  $("sh-in").href = `https://www.linkedin.com/sharing/share-offsite/?url=${enc(url)}`;
+  $("sh-x").href = `https://x.com/intent/post?text=${enc(SHARE_TEXT)}&url=${enc(url)}`;
+  $("sh-fb").href = `https://www.facebook.com/sharer/sharer.php?u=${enc(url)}`;
+  const copy = $("sh-copy");
+  copy.lastElementChild.textContent = "Copiar link";
+  copy.onclick = async () => {
+    try { await navigator.clipboard.writeText(url); copy.lastElementChild.textContent = "Link copiado!"; }
+    catch { prompt("Copie o link:", url); }
+    setTimeout(closeShare, 900);
+  };
+  m.classList.add("on");
+  const r = anchor.getBoundingClientRect(), mw = m.offsetWidth, mh = m.offsetHeight;
+  const left = Math.min(Math.max(8, r.right - mw), innerWidth - mw - 8);
+  const top = r.bottom + 6 + mh > innerHeight ? Math.max(8, r.top - mh - 6) : r.bottom + 6;
+  Object.assign(m.style, { left: left + "px", top: top + "px" });
+  m.querySelector("a").focus({ preventScroll: true });
+}
+function closeShare() { $("sharemenu").classList.remove("on"); }
+document.addEventListener("click", (e) => {
+  if (!e.target.closest("#sharemenu, .share")) closeShare();
+}, true);
+$("sharemenu").addEventListener("click", (e) => { if (e.target.closest("a")) setTimeout(closeShare, 0); });
+addEventListener("scroll", closeShare, { passive: true });
+addEventListener("resize", closeShare);
 
 function renderPeople() {
   const box = $("people");
@@ -260,11 +345,13 @@ function renderGrid() {
   g.innerHTML = "";
   const frag = document.createDocumentFragment();
   state.list.forEach((p, i) => {
-    const b = document.createElement("button");
-    b.className = "ph";
-    b.innerHTML = `<img loading="lazy" decoding="async" src="thumbs/${p.id}.jpg" width="${p.w}" height="${p.h}" alt="${p.t}"><span class="fn">${p.f} · ${p.t.replace(/\.jpe?g$/i, "")}</span>`;
-    b.onclick = () => openLb(i);
-    frag.appendChild(b);
+    const d = document.createElement("div");
+    d.className = "ph";
+    d.innerHTML = `<button class="open" aria-label="Ampliar ${p.t}"><img loading="lazy" decoding="async" src="thumbs/${p.id}.jpg" width="${p.w}" height="${p.h}" alt="${p.t}"><span class="fn">${p.f} · ${p.t.replace(/\.jpe?g$/i, "")}</span></button>` +
+      `<div class="acts"><a class="act" href="${dlUrl(p)}" download="${p.t}">${ICON_DL} Baixar</a><button class="act share">${ICON_SH} Compartilhar</button></div>`;
+    d.querySelector(".open").onclick = () => openLb(i);
+    d.querySelector(".share").onclick = (e) => share(p, e.currentTarget);
+    frag.appendChild(d);
   });
   g.appendChild(frag);
   $("empty").hidden = state.list.length > 0;
@@ -285,6 +372,10 @@ function openLb(i) {
   img.src = `full/${p.id}.jpg`;
   $("lbtitle").textContent = `${p.f} · ${p.t} · ${i + 1}/${state.list.length}`;
   $("lbdrive").href = `https://drive.google.com/file/d/${p.id}/view`;
+  $("lbdl").href = dlUrl(p);
+  $("lbdl").setAttribute("download", p.t);
+  $("lbshare").onclick = (e) => share(p, e.currentTarget);
+  history.replaceState(null, "", `#foto=${p.id}`);
   const stage = $("stage");
   stage.querySelectorAll(".box").forEach((b) => b.remove());
   p.faces.forEach(([x, y, w, h, pid]) => {
@@ -299,7 +390,12 @@ function openLb(i) {
   });
   $("lb").classList.add("on");
 }
-function closeLb() { $("lb").classList.remove("on"); state.idx = -1; }
+function closeLb() {
+  $("lb").classList.remove("on"); state.idx = -1; closeShare();
+  history.replaceState(null, "", location.pathname + location.search);
+  if (afterLb) { const f = afterLb; afterLb = null; f(); }
+}
+let afterLb = null;
 function step(d) { if (state.idx < 0) return; openLb((state.idx + d + state.list.length) % state.list.length); }
 
 $("lbx").onclick = closeLb;
@@ -307,6 +403,7 @@ $("lbprev").onclick = () => step(-1);
 $("lbnext").onclick = () => step(1);
 $("lb").onclick = (e) => { if (e.target.id === "lb") closeLb(); };
 document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && $("sharemenu").classList.contains("on")) { closeShare(); return; }
   if (state.idx < 0) return;
   if (e.key === "Escape") closeLb(); else if (e.key === "ArrowLeft") step(-1); else if (e.key === "ArrowRight") step(1);
 });
@@ -318,6 +415,14 @@ $("folders").onclick = (e) => {
   update();
 };
 update();
+
+// link direto para uma foto: #foto=<id>
+(function deepLink() {
+  const m = location.hash.match(/^#foto=([\w-]+)/);
+  if (!m) return;
+  const i = state.list.findIndex((p) => p.id === m[1]);
+  if (i >= 0) openLb(i);
+})();
 
 // convite do Detach! 27: aparece ao entrar, uma vez por sessão
 (function promo() {
@@ -337,12 +442,15 @@ update();
   $("promo-later").onclick = close;
   $("promo-cta").addEventListener("click", () => setTimeout(close, 0));
   el.onclick = (e) => { if (e.target === el) close(); };
-  setTimeout(() => {
+  const show = () => {
     last = document.activeElement;
     el.classList.add("on");
     document.addEventListener("keydown", onKey, true);
     $("promo-cta").focus({ preventScroll: true });
-  }, 900);
+  };
+  // quem chega por link de uma foto vê a foto primeiro; o convite vem ao fechar
+  if (state.idx >= 0) afterLb = () => setTimeout(show, 400);
+  else setTimeout(show, 900);
 })();
 </script>
 </body>
