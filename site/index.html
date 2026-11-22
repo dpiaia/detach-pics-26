@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quem está na foto</title>
+<style>
+  :root {
+    --bg: #f6f5f2; --surface: #ffffff; --ink: #1d1c1a; --muted: #6f6b64;
+    --line: #e3e0da; --accent: #d9480f; --accent-ink: #ffffff; --shade: rgba(20,18,16,.92);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #141312; --surface: #1d1c1a; --ink: #f1efea; --muted: #a29d94;
+      --line: #2f2d2a; --accent: #ff7a3d; --accent-ink: #141312; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif; }
+  header { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 92%, transparent);
+    backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+  .wrap { max-width: 1400px; margin: 0 auto; padding: 0 16px; }
+  .top { display: flex; align-items: center; gap: 16px; padding: 14px 0 10px; flex-wrap: wrap; }
+  h1 { font-size: 20px; margin: 0; letter-spacing: -.01em; }
+  .count { color: var(--muted); font-size: 14px; }
+  .seg { margin-left: auto; display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; background: var(--surface); }
+  .seg button { border: 0; background: none; color: var(--muted); font: inherit; font-size: 13px; padding: 5px 12px; border-radius: 999px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+
+  .people { display: flex; flex-wrap: wrap; gap: 10px; padding: 4px 0 12px; max-height: 172px; overflow: hidden; transition: max-height .25s; }
+  .people.open { max-height: 70vh; overflow-y: auto; }
+  .chip { position: relative; width: 52px; height: 52px; padding: 0; border: 2px solid transparent; border-radius: 50%;
+    background: var(--line) center/cover; cursor: pointer; flex: none; transition: transform .12s, border-color .12s; }
+  .chip:hover { transform: scale(1.08); }
+  .chip[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent); }
+  .chip .n { position: absolute; right: -4px; bottom: -4px; min-width: 20px; padding: 0 5px; border-radius: 10px;
+    background: var(--surface); color: var(--ink); border: 1px solid var(--line); font-size: 11px; line-height: 18px; font-weight: 600; }
+  .chip.dim { opacity: .28; }
+  .chip .nm { position: absolute; left: 50%; top: 100%; transform: translateX(-50%); margin-top: 3px; font-size: 10px;
+    white-space: nowrap; max-width: 70px; overflow: hidden; text-overflow: ellipsis; color: var(--muted); }
+  .people.named .chip { margin-bottom: 14px; }
+  .more { border: 0; background: none; color: var(--accent); font: inherit; font-size: 13px; cursor: pointer; padding: 0 0 12px; }
+
+  .sel { display: none; align-items: center; gap: 10px; padding: 0 0 12px; flex-wrap: wrap; font-size: 14px; }
+  .sel.on { display: flex; }
+  .sel img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; vertical-align: middle; }
+  .sel input { font: inherit; font-size: 13px; padding: 5px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); width: 180px; }
+  .sel button { font: inherit; font-size: 13px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 5px 12px; border-radius: 8px; cursor: pointer; }
+
+  main { padding: 16px 0 48px; }
+  .grid { columns: 4 240px; column-gap: 10px; }
+  .ph { break-inside: avoid; margin: 0 0 10px; position: relative; border-radius: 8px; overflow: hidden; background: var(--line); cursor: zoom-in; display: block; width: 100%; padding: 0; border: 0; }
+  .ph img { display: block; width: 100%; height: auto; }
+  .ph .fn { position: absolute; left: 6px; bottom: 6px; font-size: 11px; color: #fff; background: rgba(0,0,0,.45); padding: 1px 6px; border-radius: 4px; opacity: 0; transition: opacity .15s; }
+  .ph:hover .fn { opacity: 1; }
+  .empty { color: var(--muted); padding: 40px 0; text-align: center; }
+
+  .lb { position: fixed; inset: 0; z-index: 20; background: var(--shade); display: none; align-items: center; justify-content: center; }
+  .lb.on { display: flex; }
+  .stage { position: relative; max-width: 92vw; max-height: 86vh; }
+  .stage img { display: block; max-width: 92vw; max-height: 86vh; border-radius: 4px; }
+  .box { position: absolute; border: 2px solid rgba(255,255,255,.75); border-radius: 6px; cursor: pointer; padding: 0; background: none; }
+  .box:hover, .box.hit { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,0,0,.4); }
+  .box.unk { border-style: dashed; border-color: rgba(255,255,255,.35); cursor: default; }
+  .box .tag { position: absolute; left: 50%; top: 100%; transform: translateX(-50%); margin-top: 4px; white-space: nowrap; font-size: 12px; color: #fff; background: rgba(0,0,0,.6); padding: 1px 6px; border-radius: 4px; display: none; }
+  .box:hover .tag, .box.hit .tag { display: block; }
+  .lbbar { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #eee; font-size: 13px; }
+  .lbbar a { color: #eee; }
+  .lbbar .sp { flex: 1; }
+  .lb .x, .lb .nav { border: 0; background: rgba(255,255,255,.12); color: #fff; font-size: 20px; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; }
+  .lb .nav { position: absolute; top: 50%; transform: translateY(-50%); }
+  .lb .prev { left: 12px; } .lb .next { right: 12px; }
+  .hint { color: #bbb; font-size: 12px; position: absolute; bottom: 12px; left: 0; right: 0; text-align: center; }
+  @media (max-width: 600px) { .chip { width: 44px; height: 44px; } .people { max-height: 150px; } .seg { margin-left: 0; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="top">
+      <h1>Quem está na foto</h1>
+      <span class="count" id="count"></span>
+      <div class="seg" id="folders">
+        <button data-f="" aria-pressed="true">Todas</button>
+        <button data-f="D1" aria-pressed="false">D1</button>
+        <button data-f="D2" aria-pressed="false">D2</button>
+      </div>
+    </div>
+    <div class="sel" id="sel"></div>
+    <div class="people" id="people"></div>
+    <button class="more" id="more">Ver todas as pessoas</button>
+  </div>
+</header>
+<main class="wrap">
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" hidden>Nenhuma foto com todas as pessoas selecionadas.</div>
+</main>
+
+<div class="lb" id="lb" role="dialog" aria-modal="true">
+  <div class="lbbar"><span id="lbtitle"></span><a id="lbdrive" target="_blank" rel="noopener">Abrir no Drive</a><span class="sp"></span><button class="x" id="lbx" aria-label="Fechar">×</button></div>
+  <button class="nav prev" id="lbprev" aria-label="Anterior">‹</button>
+  <div class="stage" id="stage"><img id="lbimg" alt=""></div>
+  <button class="nav next" id="lbnext" aria-label="Próxima">›</button>
+  <div class="hint">Clique num rosto para ver só as fotos dessa pessoa · ← → navegam · Esc fecha</div>
+</div>
+
+<script src="data.js"></script>
+<script>
+const { people, photos } = window.DATA;
+const store = { get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
+                set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
+const names = store.get("names", {});
+const state = { sel: new Set(), folder: "", list: [], idx: -1 };
+const $ = (id) => document.getElementById(id);
+const faceUrl = (pid) => `faces/p${pid}.jpg`;
+const label = (pid) => names[pid] || `Pessoa ${pid + 1}`;
+photos.forEach((p) => { p.ppl = new Set(p.faces.map((f) => f[4]).filter((x) => x >= 0)); });
+
+function renderPeople() {
+  const box = $("people");
+  box.classList.toggle("named", Object.keys(names).length > 0);
+  // quantas fotos cada pessoa tem dentro do filtro atual (pasta + seleção)
+  const pool = photos.filter((p) => (!state.folder || p.f === state.folder) && [...state.sel].every((s) => p.ppl.has(s)));
+  const n = new Map();
+  pool.forEach((p) => p.ppl.forEach((pid) => n.set(pid, (n.get(pid) || 0) + 1)));
+  box.innerHTML = "";
+  people.forEach(({ id }) => {
+    const c = n.get(id) || 0;
+    const b = document.createElement("button");
+    b.className = "chip" + (c === 0 && !state.sel.has(id) ? " dim" : "");
+    b.style.backgroundImage = `url(${faceUrl(id)})`;
+    b.setAttribute("aria-pressed", state.sel.has(id));
+    b.title = `${label(id)} · ${c} foto${c === 1 ? "" : "s"}`;
+    b.innerHTML = `<span class="n">${c}</span>` + (names[id] ? `<span class="nm">${names[id]}</span>` : "");
+    b.onclick = () => toggle(id);
+    box.appendChild(b);
+  });
+}
+
+function renderSel() {
+  const el = $("sel");
+  el.classList.toggle("on", state.sel.size > 0);
+  if (!state.sel.size) { el.innerHTML = ""; return; }
+  const ids = [...state.sel];
+  el.innerHTML = "<span>Fotos com</span>" + ids.map((id) => `<img src="${faceUrl(id)}" alt="">`).join("") +
+    (ids.length === 1 ? `<input id="nm" placeholder="Dar um nome a essa pessoa" value="${(names[ids[0]] || "").replace(/"/g, "&quot;")}">` : "") +
+    `<button id="clr">Limpar filtro</button>`;
+  $("clr").onclick = () => { state.sel.clear(); update(); };
+  const nm = $("nm");
+  if (nm) nm.onchange = () => { const v = nm.value.trim(); if (v) names[ids[0]] = v; else delete names[ids[0]]; store.set("names", names); renderPeople(); };
+}
+
+function renderGrid() {
+  state.list = photos.filter((p) => (!state.folder || p.f === state.folder) && [...state.sel].every((s) => p.ppl.has(s)));
+  const g = $("grid");
+  g.innerHTML = "";
+  const frag = document.createDocumentFragment();
+  state.list.forEach((p, i) => {
+    const b = document.createElement("button");
+    b.className = "ph";
+    b.innerHTML = `<img loading="lazy" decoding="async" src="thumbs/${p.id}.jpg" width="${p.w}" height="${p.h}" alt="${p.t}"><span class="fn">${p.f} · ${p.t.replace(/\.jpe?g$/i, "")}</span>`;
+    b.onclick = () => openLb(i);
+    frag.appendChild(b);
+  });
+  g.appendChild(frag);
+  $("empty").hidden = state.list.length > 0;
+  $("count").textContent = `${state.list.length} de ${photos.length} fotos · ${people.length} pessoas`;
+}
+
+function toggle(id) { state.sel.has(id) ? state.sel.delete(id) : state.sel.add(id); update(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+function update() { renderSel(); renderPeople(); renderGrid(); }
+
+function openLb(i) {
+  state.idx = i;
+  const p = state.list[i];
+  const img = $("lbimg");
+  // cópia local em alta (só existe na máquina que processou); senão, puxa do Drive
+  img.onerror = () => { img.onerror = null; img.src = `https://drive.google.com/thumbnail?id=${p.id}&sz=w2000`; };
+  img.src = `full/${p.id}.jpg`;
+  $("lbtitle").textContent = `${p.f} · ${p.t} · ${i + 1}/${state.list.length}`;
+  $("lbdrive").href = `https://drive.google.com/file/d/${p.id}/view`;
+  const stage = $("stage");
+  stage.querySelectorAll(".box").forEach((b) => b.remove());
+  p.faces.forEach(([x, y, w, h, pid]) => {
+    const b = document.createElement("button");
+    b.className = "box" + (pid < 0 ? " unk" : "") + (state.sel.has(pid) ? " hit" : "");
+    Object.assign(b.style, { left: x * 100 + "%", top: y * 100 + "%", width: w * 100 + "%", height: h * 100 + "%" });
+    if (pid >= 0) {
+      b.innerHTML = `<span class="tag">${label(pid)}</span>`;
+      b.onclick = () => { closeLb(); state.sel = new Set([pid]); update(); window.scrollTo({ top: 0 }); };
+    } else b.title = "Rosto sem grupo";
+    stage.appendChild(b);
+  });
+  $("lb").classList.add("on");
+}
+function closeLb() { $("lb").classList.remove("on"); state.idx = -1; }
+function step(d) { if (state.idx < 0) return; openLb((state.idx + d + state.list.length) % state.list.length); }
+
+$("lbx").onclick = closeLb;
+$("lbprev").onclick = () => step(-1);
+$("lbnext").onclick = () => step(1);
+$("lb").onclick = (e) => { if (e.target.id === "lb") closeLb(); };
+document.addEventListener("keydown", (e) => {
+  if (state.idx < 0) return;
+  if (e.key === "Escape") closeLb(); else if (e.key === "ArrowLeft") step(-1); else if (e.key === "ArrowRight") step(1);
+});
+$("more").onclick = () => { const o = $("people").classList.toggle("open"); $("more").textContent = o ? "Mostrar menos" : "Ver todas as pessoas"; };
+$("folders").onclick = (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  state.folder = b.dataset.f;
+  $("folders").querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x === b));
+  update();
+};
+update();
+</script>
+</body>
+</html>
