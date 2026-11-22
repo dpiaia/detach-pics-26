@@ -3,85 +3,133 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Quem está na foto</title>
+<title>Quem está na foto · Detach! 26</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@125,500..800&family=Fragment+Mono&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f6f5f2; --surface: #ffffff; --ink: #1d1c1a; --muted: #6f6b64;
-    --line: #e3e0da; --accent: #d9480f; --accent-ink: #ffffff; --shade: rgba(20,18,16,.92);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg: #141312; --surface: #1d1c1a; --ink: #f1efea; --muted: #a29d94;
-      --line: #2f2d2a; --accent: #ff7a3d; --accent-ink: #141312; }
+    --bg: #fff8f5; --ink: #1e0b0b; --black: #000; --muted: #6b5a57; --line: #e9dcd6;
+    --pink: #ff0095; --lilac: #b499ff; --orange: #ff4b27; --green: #69e098; --mint: #a8f8e4;
+    --wide: "Archivo", "Arial Black", sans-serif; --mono: "Fragment Mono", ui-monospace, monospace;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--ink);
-    font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif; }
-  header { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 92%, transparent);
-    backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 "Inter", -apple-system, sans-serif; }
+  button { font: inherit; color: inherit; }
   .wrap { max-width: 1400px; margin: 0 auto; padding: 0 16px; }
-  .top { display: flex; align-items: center; gap: 16px; padding: 14px 0 10px; flex-wrap: wrap; }
-  h1 { font-size: 20px; margin: 0; letter-spacing: -.01em; }
-  .count { color: var(--muted); font-size: 14px; }
-  .seg { margin-left: auto; display: inline-flex; border: 1px solid var(--line); border-radius: 999px; padding: 3px; background: var(--surface); }
-  .seg button { border: 0; background: none; color: var(--muted); font: inherit; font-size: 13px; padding: 5px 12px; border-radius: 999px; cursor: pointer; }
-  .seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+  .label { font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: .02em; }
 
-  .people { display: flex; flex-wrap: wrap; gap: 10px; padding: 4px 0 12px; max-height: 172px; overflow: hidden; transition: max-height .25s; }
-  .people.open { max-height: 70vh; overflow-y: auto; }
-  .chip { position: relative; width: 52px; height: 52px; padding: 0; border: 2px solid transparent; border-radius: 50%;
-    background: var(--line) center/cover; cursor: pointer; flex: none; transition: transform .12s, border-color .12s; }
-  .chip:hover { transform: scale(1.08); }
-  .chip[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 30%, transparent); }
-  .chip .n { position: absolute; right: -4px; bottom: -4px; min-width: 20px; padding: 0 5px; border-radius: 10px;
-    background: var(--surface); color: var(--ink); border: 1px solid var(--line); font-size: 11px; line-height: 18px; font-weight: 600; }
-  .chip.dim { opacity: .28; }
-  .chip .nm { position: absolute; left: 50%; top: 100%; transform: translateX(-50%); margin-top: 3px; font-size: 10px;
-    white-space: nowrap; max-width: 70px; overflow: hidden; text-overflow: ellipsis; color: var(--muted); }
-  .people.named .chip { margin-bottom: 14px; }
-  .more { border: 0; background: none; color: var(--accent); font: inherit; font-size: 13px; cursor: pointer; padding: 0 0 12px; }
+  /* faixa preta rolando, como no topo do site do evento */
+  .ticker { background: var(--black); color: #fff; overflow: hidden; white-space: nowrap; height: 30px; display: flex; align-items: center; }
+  .ticker .track { display: inline-flex; animation: tick 40s linear infinite; }
+  .ticker span { font-family: var(--mono); font-size: 11px; text-transform: uppercase; padding-right: 28px; }
+  .ticker span::after { content: "•"; padding-left: 28px; opacity: .6; }
+  @keyframes tick { to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) { .ticker .track { animation: none; } }
 
-  .sel { display: none; align-items: center; gap: 10px; padding: 0 0 12px; flex-wrap: wrap; font-size: 14px; }
+  .hero { padding-top: 48px; padding-bottom: 36px; display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: end; }
+  h1 { font-family: var(--wide); font-stretch: 125%; font-weight: 700; text-transform: uppercase; line-height: .95;
+    font-size: clamp(40px, 7.5vw, 104px); margin: 0; letter-spacing: .01em; }
+  .hero p { margin: 18px 0 0; max-width: 46ch; color: var(--muted); }
+  .hero .meta { text-align: right; line-height: 1.6; }
+  .stats { background: var(--black); color: #fff; }
+  .stats .wrap { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding-top: 36px; padding-bottom: 36px; text-align: center; }
+  .stats b { display: block; font-family: var(--wide); font-stretch: 125%; font-weight: 600; font-size: clamp(36px, 5vw, 64px); line-height: 1; }
+  .stats span { display: block; margin-top: 8px; font-family: var(--wide); font-stretch: 125%; font-weight: 500; text-transform: uppercase; font-size: clamp(12px, 1.4vw, 18px); }
+
+  /* barra fixa: pastas, seleção e rostos */
+  .bar { position: sticky; top: 0; z-index: 5; background: var(--bg); border-bottom: 2px solid var(--black); }
+  .top { display: flex; align-items: center; gap: 16px; padding: 14px 0 12px; flex-wrap: wrap; }
+  .top h2 { font-family: var(--wide); font-stretch: 125%; font-weight: 700; font-size: 18px; text-transform: uppercase; margin: 0; }
+  .count { color: var(--muted); }
+  .seg { margin-left: auto; display: inline-flex; border: 2px solid var(--black); }
+  .seg button { border: 0; background: var(--bg); padding: 6px 16px; cursor: pointer; }
+  .seg button + button { border-left: 2px solid var(--black); }
+  .seg button[aria-pressed="true"] { background: var(--black); color: #fff; }
+  .seg button[data-f="D1"][aria-pressed="true"] { background: var(--lilac); color: var(--black); }
+  .seg button[data-f="D2"][aria-pressed="true"] { background: var(--orange); color: var(--black); }
+
+  .people { display: flex; flex-wrap: wrap; gap: 8px; padding: 2px 0 12px; max-height: 158px; overflow: hidden; transition: max-height .25s; }
+  .people.open { max-height: 62vh; overflow-y: auto; }
+  .chip { position: relative; width: 56px; height: 56px; padding: 0; border: 2px solid transparent; background: var(--line) center/cover;
+    cursor: pointer; flex: none; transition: transform .12s; }
+  .chip:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--black); }
+  .chip[aria-pressed="true"] { border-color: var(--black); box-shadow: 4px 4px 0 var(--c); transform: translate(-2px, -2px); }
+  .chip .n { position: absolute; right: 0; bottom: 0; min-width: 22px; padding: 0 4px; background: var(--c); color: var(--black);
+    font-family: var(--mono); font-size: 11px; line-height: 17px; }
+  .chip.dim { opacity: .25; }
+  .chip .nm { position: absolute; left: 0; top: 100%; margin-top: 3px; font-size: 10px; white-space: nowrap; max-width: 64px;
+    overflow: hidden; text-overflow: ellipsis; color: var(--muted); font-family: var(--mono); text-transform: uppercase; }
+  .people.named .chip { margin-bottom: 16px; }
+  .more { border: 0; background: none; cursor: pointer; padding: 0 0 12px; text-decoration: underline; text-underline-offset: 3px; }
+
+  .sel { display: none; align-items: center; gap: 10px; margin: 0 0 12px; padding: 10px 12px; flex-wrap: wrap; background: var(--lilac); }
   .sel.on { display: flex; }
-  .sel img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; vertical-align: middle; }
-  .sel input { font: inherit; font-size: 13px; padding: 5px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--ink); width: 180px; }
-  .sel button { font: inherit; font-size: 13px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); padding: 5px 12px; border-radius: 8px; cursor: pointer; }
+  .sel img { width: 34px; height: 34px; object-fit: cover; border: 2px solid var(--black); }
+  .sel input { font: inherit; font-size: 14px; padding: 6px 10px; border: 2px solid var(--black); background: var(--bg); color: var(--ink); width: 220px; border-radius: 0; }
+  .sel button { border: 2px solid var(--black); background: var(--black); color: #fff; padding: 6px 14px; cursor: pointer; }
 
-  main { padding: 16px 0 48px; }
-  .grid { columns: 4 240px; column-gap: 10px; }
-  .ph { break-inside: avoid; margin: 0 0 10px; position: relative; border-radius: 8px; overflow: hidden; background: var(--line); cursor: zoom-in; display: block; width: 100%; padding: 0; border: 0; }
-  .ph img { display: block; width: 100%; height: auto; }
-  .ph .fn { position: absolute; left: 6px; bottom: 6px; font-size: 11px; color: #fff; background: rgba(0,0,0,.45); padding: 1px 6px; border-radius: 4px; opacity: 0; transition: opacity .15s; }
-  .ph:hover .fn { opacity: 1; }
-  .empty { color: var(--muted); padding: 40px 0; text-align: center; }
+  main { padding: 20px 0 64px; }
+  .grid { columns: 4 240px; column-gap: 8px; }
+  .ph { break-inside: avoid; margin: 0 0 8px; position: relative; overflow: hidden; background: var(--line); cursor: zoom-in; display: block; width: 100%; padding: 0; border: 0; }
+  .ph img { display: block; width: 100%; height: auto; transition: transform .3s; }
+  .ph:hover img { transform: scale(1.03); }
+  .ph .fn { position: absolute; left: 0; bottom: 0; color: var(--black); background: var(--mint); padding: 3px 8px; opacity: 0; transition: opacity .15s; }
+  .ph:hover .fn, .ph:focus-visible .fn { opacity: 1; }
+  .empty { padding: 48px 0; text-align: center; }
+  footer { border-top: 2px solid var(--black); padding: 20px 0 28px; color: var(--muted); }
 
-  .lb { position: fixed; inset: 0; z-index: 20; background: var(--shade); display: none; align-items: center; justify-content: center; }
+  .lb { position: fixed; inset: 0; z-index: 20; background: rgba(0,0,0,.94); display: none; align-items: center; justify-content: center; }
   .lb.on { display: flex; }
-  .stage { position: relative; max-width: 92vw; max-height: 86vh; }
-  .stage img { display: block; max-width: 92vw; max-height: 86vh; border-radius: 4px; }
+  .stage { position: relative; max-width: 92vw; max-height: 84vh; }
+  .stage img { display: block; max-width: 92vw; max-height: 84vh; }
   .stage.loading .box { visibility: hidden; }
   .stage.loading img { opacity: .35; }
-  .box { position: absolute; border: 2px solid rgba(255,255,255,.75); border-radius: 6px; cursor: pointer; padding: 0; background: none; }
-  .box:hover, .box.hit { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,0,0,.4); }
-  .box.unk { border-style: dashed; border-color: rgba(255,255,255,.35); cursor: default; }
-  .box .tag { position: absolute; left: 50%; top: 100%; transform: translateX(-50%); margin-top: 4px; white-space: nowrap; font-size: 12px; color: #fff; background: rgba(0,0,0,.6); padding: 1px 6px; border-radius: 4px; display: none; }
+  .box { position: absolute; border: 2px solid rgba(255,255,255,.8); cursor: pointer; padding: 0; background: none; }
+  .box:hover, .box.hit { border-color: var(--green); box-shadow: 3px 3px 0 var(--pink); }
+  .box.unk { border-style: dashed; border-color: rgba(255,255,255,.35); cursor: default; box-shadow: none; }
+  .box .tag { position: absolute; left: 0; top: 100%; margin-top: 4px; white-space: nowrap; color: var(--black); background: var(--green);
+    padding: 2px 6px; display: none; font-family: var(--mono); font-size: 11px; text-transform: uppercase; }
   .box:hover .tag, .box.hit .tag { display: block; }
-  .lbbar { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #eee; font-size: 13px; }
-  .lbbar a { color: #eee; }
+  .lbbar { position: absolute; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 16px; padding: 12px 16px; color: #fff; }
+  .lbbar a { color: var(--mint); }
   .lbbar .sp { flex: 1; }
-  .lb .x, .lb .nav { border: 0; background: rgba(255,255,255,.12); color: #fff; font-size: 20px; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; }
+  .lb .x, .lb .nav { border: 2px solid #fff; background: var(--black); color: #fff; font-size: 20px; width: 42px; height: 42px; cursor: pointer; }
+  .lb .x:hover, .lb .nav:hover { background: var(--orange); border-color: var(--orange); color: var(--black); }
   .lb .nav { position: absolute; top: 50%; transform: translateY(-50%); }
   .lb .prev { left: 12px; } .lb .next { right: 12px; }
-  .hint { color: #bbb; font-size: 12px; position: absolute; bottom: 12px; left: 0; right: 0; text-align: center; }
-  @media (max-width: 600px) { .chip { width: 44px; height: 44px; } .people { max-height: 150px; } .seg { margin-left: 0; } }
+  .hint { color: #bbb; position: absolute; bottom: 12px; left: 0; right: 0; text-align: center; padding: 0 16px; }
+  @media (max-width: 700px) {
+    .hero { grid-template-columns: 1fr; padding-top: 32px; padding-bottom: 28px; } .hero .meta { text-align: left; }
+    .chip { width: 46px; height: 46px; } .people { max-height: 134px; } .seg { margin-left: 0; }
+    .stats .wrap { padding-top: 24px; padding-bottom: 24px; }
+    .top h2 { display: none; } .top { gap: 10px; padding: 10px 0; }
+  }
 </style>
 </head>
 <body>
-<header>
+<div class="ticker" aria-hidden="true"><div class="track" id="ticker"></div></div>
+<section class="wrap hero">
+  <div>
+    <div class="label">Detach! 26 · Fotos do evento</div>
+    <h1>Quem está<br>na foto</h1>
+    <p>Clique num rosto para ver só as fotos dessa pessoa. Escolha mais de um para achar as fotos em que estão juntos.</p>
+  </div>
+  <div class="meta label">Fortaleza, Ceará<br>20, 21 e 22 de novembro</div>
+</section>
+<section class="stats">
+  <div class="wrap">
+    <div><b id="st-photos"></b><span>Fotos</span></div>
+    <div><b id="st-people"></b><span>Pessoas</span></div>
+    <div><b id="st-faces"></b><span>Rostos</span></div>
+  </div>
+</section>
+<div class="bar" id="bar">
   <div class="wrap">
     <div class="top">
-      <h1>Quem está na foto</h1>
-      <span class="count" id="count"></span>
-      <div class="seg" id="folders">
+      <h2>Galeria</h2>
+      <span class="count label" id="count"></span>
+      <div class="seg label" id="folders">
         <button data-f="" aria-pressed="true">Todas</button>
         <button data-f="D1" aria-pressed="false">D1</button>
         <button data-f="D2" aria-pressed="false">D2</button>
@@ -89,20 +137,21 @@
     </div>
     <div class="sel" id="sel"></div>
     <div class="people" id="people"></div>
-    <button class="more" id="more">Ver todas as pessoas</button>
+    <button class="more label" id="more">Ver todas as pessoas</button>
   </div>
-</header>
+</div>
 <main class="wrap">
   <div class="grid" id="grid"></div>
-  <div class="empty" id="empty" hidden>Nenhuma foto com todas as pessoas selecionadas.</div>
+  <div class="empty label" id="empty" hidden>Nenhuma foto com todas as pessoas selecionadas.</div>
 </main>
+<footer><div class="wrap label">Rostos agrupados automaticamente · pode haver erros</div></footer>
 
 <div class="lb" id="lb" role="dialog" aria-modal="true">
-  <div class="lbbar"><span id="lbtitle"></span><a id="lbdrive" target="_blank" rel="noopener">Abrir no Drive</a><span class="sp"></span><button class="x" id="lbx" aria-label="Fechar">×</button></div>
+  <div class="lbbar"><span id="lbtitle" class="label"></span><a id="lbdrive" class="label" target="_blank" rel="noopener">Abrir no Drive</a><span class="sp"></span><button class="x" id="lbx" aria-label="Fechar">×</button></div>
   <button class="nav prev" id="lbprev" aria-label="Anterior">‹</button>
   <div class="stage" id="stage"><img id="lbimg" alt=""></div>
   <button class="nav next" id="lbnext" aria-label="Próxima">›</button>
-  <div class="hint">Clique num rosto para ver só as fotos dessa pessoa · ← → navegam · Esc fecha</div>
+  <div class="hint label">Clique num rosto para ver só as fotos dessa pessoa · ← → navegam · Esc fecha</div>
 </div>
 
 <script src="data.js"></script>
@@ -116,6 +165,16 @@ const $ = (id) => document.getElementById(id);
 const faceUrl = (pid) => `faces/p${pid}.jpg`;
 const label = (pid) => names[pid] || `Pessoa ${pid + 1}`;
 photos.forEach((p) => { p.ppl = new Set(p.faces.map((f) => f[4]).filter((x) => x >= 0)); });
+const COLORS = ["var(--pink)", "var(--lilac)", "var(--orange)", "var(--green)", "var(--mint)"];
+const fmt = (n) => n.toLocaleString("pt-BR");
+const nFaces = photos.reduce((s, p) => s + p.faces.length, 0);
+$("st-photos").textContent = fmt(photos.length);
+$("st-people").textContent = fmt(people.length);
+$("st-faces").textContent = fmt(nFaces);
+const tick = ["Detach! 26", "Fortaleza", "20, 21 e 22 de novembro", `${fmt(photos.length)} fotos`, `${fmt(people.length)} pessoas`, "Clique num rosto"];
+$("ticker").innerHTML = [...tick, ...tick, ...tick, ...tick].map((t) => `<span>${t}</span>`).join("");
+// a barra é sticky; a posição natural dela é logo abaixo da faixa de números
+const toGallery = () => { const st = document.querySelector(".stats"); const y = st.offsetTop + st.offsetHeight; if (window.scrollY > y) window.scrollTo({ top: y }); };
 
 function renderPeople() {
   const box = $("people");
@@ -130,6 +189,7 @@ function renderPeople() {
     const b = document.createElement("button");
     b.className = "chip" + (c === 0 && !state.sel.has(id) ? " dim" : "");
     b.style.backgroundImage = `url(${faceUrl(id)})`;
+    b.style.setProperty("--c", COLORS[id % COLORS.length]);
     b.setAttribute("aria-pressed", state.sel.has(id));
     b.title = `${label(id)} · ${c} foto${c === 1 ? "" : "s"}`;
     b.innerHTML = `<span class="n">${c}</span>` + (names[id] ? `<span class="nm">${names[id]}</span>` : "");
@@ -168,7 +228,7 @@ function renderGrid() {
   $("count").textContent = `${state.list.length} de ${photos.length} fotos · ${people.length} pessoas`;
 }
 
-function toggle(id) { state.sel.has(id) ? state.sel.delete(id) : state.sel.add(id); update(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+function toggle(id) { state.sel.has(id) ? state.sel.delete(id) : state.sel.add(id); update(); toGallery(); }
 function update() { renderSel(); renderPeople(); renderGrid(); }
 
 function openLb(i) {
@@ -190,7 +250,7 @@ function openLb(i) {
     Object.assign(b.style, { left: x * 100 + "%", top: y * 100 + "%", width: w * 100 + "%", height: h * 100 + "%" });
     if (pid >= 0) {
       b.innerHTML = `<span class="tag">${label(pid)}</span>`;
-      b.onclick = () => { closeLb(); state.sel = new Set([pid]); update(); window.scrollTo({ top: 0 }); };
+      b.onclick = () => { closeLb(); state.sel = new Set([pid]); update(); toGallery(); };
     } else b.title = "Rosto sem grupo";
     stage.appendChild(b);
   });
