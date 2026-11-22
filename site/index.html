@@ -78,6 +78,9 @@
   .ph:hover .fn, .ph:focus-visible .fn { opacity: 1; }
   .empty { padding: 48px 0; text-align: center; }
   footer { border-top: 2px solid var(--black); padding: 20px 0 28px; color: var(--muted); }
+  footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px 24px; }
+  footer .credit { color: var(--ink); text-transform: none; }
+  footer .credit a { color: var(--ink); }
 
   .lb { position: fixed; inset: 0; z-index: 20; background: rgba(0,0,0,.94); display: none; align-items: center; justify-content: center; }
   .lb.on { display: flex; }
@@ -170,7 +173,7 @@
   <div class="grid" id="grid"></div>
   <div class="empty label" id="empty" hidden>Nenhuma foto com todas as pessoas selecionadas.</div>
 </main>
-<footer><div class="wrap label">Rostos agrupados automaticamente · pode haver erros · <a class="ad27" href="https://www.sympla.com.br/evento/detach-27-olinda-e-recife/3662370" target="_blank" rel="noopener">Detach! 27: ingressos à venda</a></div></footer>
+<footer><div class="wrap label"><span>Rostos agrupados automaticamente · pode haver erros · <a class="ad27" href="https://www.sympla.com.br/evento/detach-27-olinda-e-recife/3662370" target="_blank" rel="noopener">Detach! 27: ingressos à venda</a></span><span class="credit">Criado com <span aria-label="amor">❤️</span> por Denis Piaia via <a href="https://claude.com/claude-code" target="_blank" rel="noopener">Claude Code</a></span></div></footer>
 
 <div class="promo" id="promo" role="dialog" aria-modal="true" aria-labelledby="promo-title">
   <div class="card">
