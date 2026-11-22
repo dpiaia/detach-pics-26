@@ -76,6 +76,9 @@
   .sel img { width: 34px; height: 34px; object-fit: cover; border: 2px solid var(--black); }
   .sel input { font: inherit; font-size: 14px; padding: 6px 10px; border: 2px solid var(--black); background: var(--bg); color: var(--ink); width: 220px; border-radius: 0; }
   .sel button { border: 2px solid var(--black); background: var(--black); color: #fff; padding: 6px 14px; cursor: pointer; }
+  .sel #shf { display: inline-flex; align-items: center; gap: 6px; margin-left: auto; background: var(--bg); color: var(--black); }
+  .sel #shf svg { width: 15px; height: 15px; }
+  .sel #shf:hover { background: var(--green); }
 
   main { padding: 20px 0 64px; }
   .grid { columns: 4 240px; column-gap: 8px; }
@@ -216,7 +219,7 @@
     <button class="close" id="promo-x" aria-label="Fechar">×</button>
     <img src="img/detach27.jpg" width="900" height="642" alt="Detach! Olinda e Recife · Novembro, 2027 · Especial 5 anos">
     <div class="body">
-      <div class="tags label"><span style="background:var(--lilac)">19 e 20 de nov · 2027</span><span style="background:var(--mint)">Olinda e Recife</span><span style="background:var(--green)">Especial 5 anos</span></div>
+      <div class="tags label"><span style="background:var(--lilac)">Novembro 2027 · data a definir</span><span style="background:var(--mint)">Olinda e Recife</span><span style="background:var(--green)">Especial 5 anos</span></div>
       <h3 id="promo-title">Se achou nas fotos? Ano que vem tem mais.</h3>
       <p>O Detach! faz 5 anos e muda de praia: agora em <strong>Olinda e Recife</strong>. O lote <strong>Super Antecipado</strong> já está à venda, em até 12x. Garanta o seu antes de virar foto de novo.</p>
       <a class="cta" id="promo-cta" href="https://www.sympla.com.br/evento/detach-27-olinda-e-recife/3662370" target="_blank" rel="noopener">Garantir meu ingresso <span aria-hidden="true">↗</span></a>
@@ -267,20 +270,47 @@ const ICON_DL = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
 const ICON_SH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 15V4m0 0L7 9m5-5l5 5M5 13v7h14v-7"/></svg>`;
 // download direto da original no Drive (o Drive responde com "attachment")
 const dlUrl = (p) => `https://drive.usercontent.google.com/download?id=${p.id}&export=download`;
-const photoUrl = (p) => `${location.origin}${location.pathname}#foto=${p.id}`;
-const SHARE_TEXT = "Olha essa foto do Detach! 26 📸";
+// estado na URL: #pessoas=3,17&pasta=D1&foto=<id> (pessoas numeradas como na tela)
+function hashFor(photo) {
+  const q = new URLSearchParams();
+  if (state.sel.size) q.set("pessoas", [...state.sel].map((id) => id + 1).join(","));
+  if (state.folder) q.set("pasta", state.folder);
+  if (photo) q.set("foto", photo.id);
+  const h = q.toString().replace(/%2C/g, ",");
+  return h ? "#" + h : "";
+}
+const shareUrl = (photo) => location.origin + location.pathname + hashFor(photo);
+function syncUrl() {
+  const p = state.idx >= 0 ? state.list[state.idx] : null;
+  history.replaceState(null, "", location.pathname + location.search + hashFor(p));
+}
+function readUrl() {
+  const q = new URLSearchParams(location.hash.slice(1));
+  const ids = (q.get("pessoas") || "").split(",").map((x) => parseInt(x, 10) - 1).filter((id) => people[id]);
+  state.sel = new Set(ids);
+  state.folder = ["D1", "D2"].includes(q.get("pasta")) ? q.get("pasta") : "";
+  $("folders").querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x.dataset.f === state.folder));
+  return q.get("foto");
+}
+const who = () => {
+  const n = [...state.sel].map((id) => names[id]).filter(Boolean);
+  if (n.length === state.sel.size) return "de " + (n.length > 1 ? n.slice(0, -1).join(", ") + " e " + n.at(-1) : n[0]);
+  return state.sel.size > 1 ? "dessa turma" : "dessa pessoa";
+};
+const photoShare = (p) => ({ url: shareUrl(p), text: "Olha essa foto do Detach! 26 📸" });
+const filterShare = () => ({ url: shareUrl(null),
+  text: `Fotos ${who()} no Detach! 26${state.folder ? " (" + state.folder + ")" : ""} 📸` });
 
-function share(p, anchor) {
-  const url = photoUrl(p);
+function share({ url, text }, anchor) {
   // no celular, abre a folha de compartilhamento do sistema
   if (navigator.share && matchMedia("(pointer: coarse)").matches) {
-    navigator.share({ title: "Detach! 26", text: SHARE_TEXT, url }).catch(() => {});
+    navigator.share({ title: "Detach! 26", text, url }).catch(() => {});
     return;
   }
   const m = $("sharemenu"), enc = encodeURIComponent;
-  $("sh-wa").href = `https://wa.me/?text=${enc(SHARE_TEXT + " " + url)}`;
+  $("sh-wa").href = `https://wa.me/?text=${enc(text + " " + url)}`;
   $("sh-in").href = `https://www.linkedin.com/sharing/share-offsite/?url=${enc(url)}`;
-  $("sh-x").href = `https://x.com/intent/post?text=${enc(SHARE_TEXT)}&url=${enc(url)}`;
+  $("sh-x").href = `https://x.com/intent/post?text=${enc(text)}&url=${enc(url)}`;
   $("sh-fb").href = `https://www.facebook.com/sharer/sharer.php?u=${enc(url)}`;
   const copy = $("sh-copy");
   copy.lastElementChild.textContent = "Copiar link";
@@ -333,8 +363,9 @@ function renderSel() {
   const ids = [...state.sel];
   el.innerHTML = "<span>Fotos com</span>" + ids.map((id) => `<img src="${faceUrl(id)}" alt="">`).join("") +
     (ids.length === 1 ? `<input id="nm" placeholder="Dar um nome a essa pessoa" value="${(names[ids[0]] || "").replace(/"/g, "&quot;")}">` : "") +
-    `<button id="clr">Limpar filtro</button>`;
+    `<button id="shf" class="share">${ICON_SH} Compartilhar</button><button id="clr">Limpar filtro</button>`;
   $("clr").onclick = () => { state.sel.clear(); update(); };
+  $("shf").onclick = (e) => share(filterShare(), e.currentTarget);
   const nm = $("nm");
   if (nm) nm.onchange = () => { const v = nm.value.trim(); if (v) names[ids[0]] = v; else delete names[ids[0]]; store.set("names", names); renderPeople(); };
 }
@@ -350,7 +381,7 @@ function renderGrid() {
     d.innerHTML = `<button class="open" aria-label="Ampliar ${p.t}"><img loading="lazy" decoding="async" src="thumbs/${p.id}.jpg" width="${p.w}" height="${p.h}" alt="${p.t}"><span class="fn">${p.f} · ${p.t.replace(/\.jpe?g$/i, "")}</span></button>` +
       `<div class="acts"><a class="act" href="${dlUrl(p)}" download="${p.t}">${ICON_DL} Baixar</a><button class="act share">${ICON_SH} Compartilhar</button></div>`;
     d.querySelector(".open").onclick = () => openLb(i);
-    d.querySelector(".share").onclick = (e) => share(p, e.currentTarget);
+    d.querySelector(".share").onclick = (e) => share(photoShare(p), e.currentTarget);
     frag.appendChild(d);
   });
   g.appendChild(frag);
@@ -359,7 +390,7 @@ function renderGrid() {
 }
 
 function toggle(id) { state.sel.has(id) ? state.sel.delete(id) : state.sel.add(id); update(); toGallery(); }
-function update() { renderSel(); renderPeople(); renderGrid(); }
+function update() { renderSel(); renderPeople(); renderGrid(); syncUrl(); }
 
 function openLb(i) {
   state.idx = i;
@@ -374,8 +405,8 @@ function openLb(i) {
   $("lbdrive").href = `https://drive.google.com/file/d/${p.id}/view`;
   $("lbdl").href = dlUrl(p);
   $("lbdl").setAttribute("download", p.t);
-  $("lbshare").onclick = (e) => share(p, e.currentTarget);
-  history.replaceState(null, "", `#foto=${p.id}`);
+  $("lbshare").onclick = (e) => share(photoShare(p), e.currentTarget);
+  syncUrl();
   const stage = $("stage");
   stage.querySelectorAll(".box").forEach((b) => b.remove());
   p.faces.forEach(([x, y, w, h, pid]) => {
@@ -392,7 +423,7 @@ function openLb(i) {
 }
 function closeLb() {
   $("lb").classList.remove("on"); state.idx = -1; closeShare();
-  history.replaceState(null, "", location.pathname + location.search);
+  syncUrl();
   if (afterLb) { const f = afterLb; afterLb = null; f(); }
 }
 let afterLb = null;
@@ -414,15 +445,25 @@ $("folders").onclick = (e) => {
   $("folders").querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x === b));
   update();
 };
+// abre com o filtro e a foto que vieram no link
+const startPhoto = readUrl();
 update();
-
-// link direto para uma foto: #foto=<id>
-(function deepLink() {
-  const m = location.hash.match(/^#foto=([\w-]+)/);
-  if (!m) return;
-  const i = state.list.findIndex((p) => p.id === m[1]);
+if (state.sel.size) {
+  // link com filtro: desce direto para as fotos (sem o navegador restaurar a rolagem antiga)
+  history.scrollRestoration = "manual";
+  const st = document.querySelector(".stats");
+  setTimeout(() => window.scrollTo({ top: st.offsetTop + st.offsetHeight }), 0);
+}
+if (startPhoto) {
+  const i = state.list.findIndex((p) => p.id === startPhoto);
   if (i >= 0) openLb(i);
-})();
+}
+addEventListener("hashchange", () => {
+  if (location.hash === hashFor(state.idx >= 0 ? state.list[state.idx] : null)) return;
+  const f = readUrl(); closeLb(); update();
+  const i = f ? state.list.findIndex((p) => p.id === f) : -1;
+  if (i >= 0) openLb(i);
+});
 
 // convite do Detach! 27: aparece ao entrar, uma vez por sessão
 (function promo() {
