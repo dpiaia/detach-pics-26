@@ -58,6 +58,8 @@
   .lb.on { display: flex; }
   .stage { position: relative; max-width: 92vw; max-height: 86vh; }
   .stage img { display: block; max-width: 92vw; max-height: 86vh; border-radius: 4px; }
+  .stage.loading .box { visibility: hidden; }
+  .stage.loading img { opacity: .35; }
   .box { position: absolute; border: 2px solid rgba(255,255,255,.75); border-radius: 6px; cursor: pointer; padding: 0; background: none; }
   .box:hover, .box.hit { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,0,0,.4); }
   .box.unk { border-style: dashed; border-color: rgba(255,255,255,.35); cursor: default; }
@@ -174,6 +176,8 @@ function openLb(i) {
   const p = state.list[i];
   const img = $("lbimg");
   // cópia local em alta (só existe na máquina que processou); senão, puxa do Drive
+  $("stage").classList.add("loading");
+  img.onload = () => $("stage").classList.remove("loading");
   img.onerror = () => { img.onerror = null; img.src = `https://drive.google.com/thumbnail?id=${p.id}&sz=w2000`; };
   img.src = `full/${p.id}.jpg`;
   $("lbtitle").textContent = `${p.f} · ${p.t} · ${i + 1}/${state.list.length}`;
