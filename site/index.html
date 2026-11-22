@@ -173,6 +173,49 @@
   @keyframes pop { from { transform: translateY(24px) scale(.96); opacity: 0; } }
   @media (prefers-reduced-motion: reduce) { .promo.on, .promo .card { animation: none; } }
   @media (max-width: 420px) { .promo h3 { font-size: 21px; } .promo .body { padding: 18px; } .promo .card { box-shadow: 6px 6px 0 var(--pink); } }
+
+  /* busca por selfie */
+  .finder { margin-top: 26px; display: inline-flex; flex-direction: column; gap: 10px; padding: 16px; background: var(--mint); border: 2px solid var(--black); box-shadow: 6px 6px 0 var(--black); max-width: 100%; }
+  .finder strong { font-family: var(--wide); font-stretch: 125%; font-weight: 700; text-transform: uppercase; font-size: 17px; }
+  .finder .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border: 2px solid var(--black); background: var(--bg); color: var(--black);
+    cursor: pointer; font-family: var(--mono); font-size: 12px; text-transform: uppercase; text-decoration: none; transition: transform .12s, box-shadow .12s; }
+  .btn svg { width: 16px; height: 16px; flex: none; }
+  .btn:hover { transform: translate(-2px, -2px); box-shadow: 3px 3px 0 var(--black); }
+  .btn.primary { background: var(--black); color: #fff; }
+  .btn.primary:hover { box-shadow: 3px 3px 0 var(--orange); }
+  .finder small { color: var(--ink); opacity: .75; }
+  .top .btn { padding: 6px 12px; }
+  .top .btn.findbtn { margin-left: auto; }
+  .top .btn.findbtn + .seg { margin-left: 0; }
+
+  .fmodal { position: fixed; inset: 0; z-index: 35; display: none; align-items: center; justify-content: center; padding: 16px; background: rgba(30,11,11,.6); }
+  .fmodal.on { display: flex; animation: fade .2s ease-out; }
+  .fmodal .card { position: relative; width: min(520px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; background: var(--bg);
+    border: 2px solid var(--black); box-shadow: 10px 10px 0 var(--mint); padding: 22px; }
+  .fmodal h3 { font-family: var(--wide); font-stretch: 125%; font-weight: 700; text-transform: uppercase; font-size: 22px; line-height: 1.05; margin: 0 40px 10px 0; }
+  .fmodal p { margin: 0 0 16px; color: var(--muted); }
+  .fmodal .close { position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; border: 2px solid var(--black); background: var(--bg); font-size: 18px; cursor: pointer; }
+  .fmodal .close:hover { background: var(--orange); }
+  .fmodal video, .fmodal .shot { display: block; width: 100%; max-height: 52vh; object-fit: cover; background: #000; border: 2px solid var(--black); }
+  .fmodal video { transform: scaleX(-1); }
+  .fmodal .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  .fmodal .row .btn { flex: 1; justify-content: center; }
+  .fstep { display: none; } .fstep.on { display: block; }
+  .working { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+  .spin { width: 22px; height: 22px; border: 3px solid var(--line); border-top-color: var(--black); border-radius: 50%; animation: spin .8s linear infinite; flex: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .me { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .me canvas { width: 64px; height: 64px; border: 2px solid var(--black); flex: none; }
+  .cands { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .cand { padding: 0; border: 2px solid var(--black); background: var(--bg); cursor: pointer; text-align: left; transition: transform .12s, box-shadow .12s; }
+  .cand:hover { transform: translate(-2px, -2px); box-shadow: 4px 4px 0 var(--black); }
+  .cand img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; }
+  .cand span { display: block; padding: 6px 8px; font-family: var(--mono); font-size: 11px; text-transform: uppercase; }
+  .cand.best { box-shadow: 4px 4px 0 var(--green); }
+  .badge { display: inline-block; padding: 2px 8px; font-family: var(--mono); font-size: 11px; text-transform: uppercase; color: var(--black); }
+  .fmodal .err { color: var(--ink); background: #ffe1d9; padding: 10px 12px; border: 2px solid var(--orange); }
+  @media (max-width: 700px) { .top .btn.findbtn { margin-left: 0; } .top .btn.findbtn span { display: none; } }
 </style>
 </head>
 <body>
@@ -182,6 +225,14 @@
     <div class="label">Detach! 26 · Fotos do evento</div>
     <h1>Quem está<br>na foto</h1>
     <p>Clique num rosto para ver só as fotos dessa pessoa. Escolha mais de um para achar as fotos em que estão juntos.</p>
+    <div class="finder">
+      <strong>Ache suas fotos com uma selfie</strong>
+      <div class="row">
+        <button class="btn primary" data-find="camera"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg> Tirar selfie</button>
+        <button class="btn" data-find="upload"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 16V4m0 0L7 9m5-5l5 5M4 20h16"/></svg> Enviar uma foto</button>
+      </div>
+      <small class="label">A foto não sai do seu aparelho: o reconhecimento roda no navegador.</small>
+    </div>
   </div>
   <div class="meta label">Fortaleza, Ceará<br>20, 21 e 22 de novembro</div>
 </section>
@@ -197,6 +248,7 @@
     <div class="top">
       <h2>Galeria</h2>
       <span class="count label" id="count"></span>
+      <button class="btn findbtn" data-find="camera" title="Achar minhas fotos com uma selfie"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>Buscar por selfie</span></button>
       <div class="seg label" id="folders">
         <button data-f="" aria-pressed="true">Todas</button>
         <button data-f="D1" aria-pressed="false">D1</button>
@@ -244,7 +296,37 @@
   <button id="sh-copy" role="menuitem"><span class="dot" style="background:var(--pink)"></span><span>Copiar link</span></button>
 </div>
 
+<div class="fmodal" id="fmodal" role="dialog" aria-modal="true" aria-labelledby="f-title">
+  <div class="card">
+    <button class="close" id="f-x" aria-label="Fechar">×</button>
+    <h3 id="f-title">Ache suas fotos</h3>
+    <div class="fstep" id="f-cam">
+      <p>Olhe para a câmera, de frente e com boa luz.</p>
+      <video id="f-video" playsinline muted></video>
+      <div class="row">
+        <button class="btn primary" id="f-snap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg> Capturar</button>
+        <button class="btn" data-find="upload"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 16V4m0 0L7 9m5-5l5 5M4 20h16"/></svg> Enviar uma foto</button>
+      </div>
+    </div>
+    <div class="fstep" id="f-work">
+      <canvas class="shot" id="f-shot"></canvas>
+      <div class="working"><div class="spin"></div><span class="label" id="f-status">Procurando você nas fotos…</span></div>
+    </div>
+    <div class="fstep" id="f-res">
+      <div class="me"><canvas id="f-me" width="112" height="112"></canvas><div id="f-msg"></div></div>
+      <div class="cands" id="f-cands"></div>
+      <div class="row">
+        <button class="btn" data-find="camera"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg> Outra selfie</button>
+        <button class="btn" data-find="upload"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 16V4m0 0L7 9m5-5l5 5M4 20h16"/></svg> Outra foto</button>
+      </div>
+    </div>
+  </div>
+</div>
+<input type="file" id="f-file" accept="image/*" hidden>
+<input type="file" id="f-capture" accept="image/*" capture="user" hidden>
+
 <script src="data.js"></script>
+<script src="selfie.js" defer></script>
 <script>
 const { people, photos } = window.DATA;
 const store = { get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } },
@@ -464,6 +546,122 @@ addEventListener("hashchange", () => {
   const i = f ? state.list.findIndex((p) => p.id === f) : -1;
   if (i >= 0) openLb(i);
 });
+
+// busca por selfie: câmera ou upload → reconhece no navegador → filtra
+(function finder() {
+  const modal = $("fmodal");
+  const steps = ["f-cam", "f-work", "f-res"];
+  let stream = null;
+  const show = (id) => { steps.forEach((s) => $(s).classList.toggle("on", s === id)); modal.classList.add("on"); };
+  const stopCam = () => { if (stream) stream.getTracks().forEach((t) => t.stop()); stream = null; };
+  const close = () => { stopCam(); modal.classList.remove("on"); };
+  $("f-x").onclick = close;
+  modal.onclick = (e) => { if (e.target === modal) close(); };
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && modal.classList.contains("on")) close(); });
+
+  const warm = () => window.SelfieSearch && SelfieSearch.init().catch(() => {});
+  document.querySelectorAll("[data-find]").forEach((b) => b.addEventListener("pointerenter", warm, { once: true }));
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-find]");
+    if (!b) return;
+    warm();
+    if (b.dataset.find === "upload") { $("f-file").click(); return; }
+    openCamera();
+  });
+
+  async function openCamera() {
+    // no celular, a câmera nativa é melhor que um preview no navegador
+    if (matchMedia("(pointer: coarse)").matches || !navigator.mediaDevices?.getUserMedia) { $("f-capture").click(); return; }
+    $("f-title").textContent = "Tire uma selfie";
+    show("f-cam");
+    try {
+      stopCam();
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 1280 } }, audio: false });
+      const v = $("f-video"); v.srcObject = stream; await v.play();
+    } catch {
+      stopCam(); close(); $("f-file").click();
+    }
+  }
+  $("f-snap").onclick = () => {
+    const v = $("f-video"), c = document.createElement("canvas");
+    c.width = v.videoWidth; c.height = v.videoHeight;
+    c.getContext("2d").drawImage(v, 0, 0);
+    stopCam();
+    run(c);
+  };
+  for (const id of ["f-file", "f-capture"]) {
+    $(id).onchange = async (e) => {
+      const f = e.target.files[0]; e.target.value = "";
+      if (!f) return;
+      const img = new Image();
+      img.src = URL.createObjectURL(f);
+      try { await img.decode(); } catch { return fail("Não consegui abrir essa imagem. Tente outra, em JPG ou PNG."); }
+      run(img);
+    };
+  }
+
+  function fail(msg) {
+    $("f-title").textContent = "Ops";
+    $("f-me").style.display = "none";
+    $("f-msg").innerHTML = `<div class="err">${msg}</div>`;
+    $("f-cands").innerHTML = "";
+    show("f-res");
+  }
+
+  async function run(src) {
+    $("f-title").textContent = "Procurando você";
+    const shot = $("f-shot"), w = src.naturalWidth || src.width, h = src.naturalHeight || src.height, k = Math.min(1, 900 / Math.max(w, h));
+    shot.width = Math.round(w * k); shot.height = Math.round(h * k);
+    shot.getContext("2d").drawImage(src, 0, 0, shot.width, shot.height);
+    $("f-status").textContent = window.ort ? "Procurando você nas fotos…" : "Carregando o reconhecimento (só na primeira vez)…";
+    show("f-work");
+    let r;
+    try {
+      if (!window.SelfieSearch) throw new Error("motor não carregou");
+      await SelfieSearch.init();
+      $("f-status").textContent = "Procurando você nas fotos…";
+      r = await SelfieSearch.identify(src);
+    } catch (err) {
+      return fail("O reconhecimento não carregou. Confira a conexão e tente de novo.");
+    }
+    if (!r.matches) return fail("Não achei um rosto nessa foto. Tente de frente, perto e com boa luz.");
+    results(r);
+  }
+
+  function results(r) {
+    const [a, b] = r.matches;
+    const sure = a.sim >= 0.5 && a.sim - b.sim >= 0.1;
+    const maybe = a.sim >= 0.33;
+    const me = $("f-me"); me.style.display = "";
+    me.getContext("2d").drawImage(r.crop, 0, 0);
+    const count = (pid) => people[pid].n;
+    if (sure) {
+      $("f-title").textContent = "Achamos você!";
+      $("f-msg").innerHTML = `<span class="badge" style="background:var(--green)">${count(a.pid)} fotos</span><p style="margin:6px 0 10px">Se não for você, escolha outra pessoa abaixo.</p><button class="btn primary" id="f-go">Ver minhas fotos →</button>`;
+      $("f-go").onclick = close;
+      pick(a.pid, false);
+    } else if (maybe) {
+      $("f-title").textContent = "É alguma dessas pessoas?";
+      $("f-msg").innerHTML = `<p style="margin:0">Não tenho certeza. Toque em quem é você.</p>`;
+    } else {
+      $("f-title").textContent = "Não te encontrei";
+      $("f-msg").innerHTML = `<p style="margin:0">Talvez você não apareça nas fotos, ou o rosto saiu pequeno ou de lado. Tente outra foto, ou veja se é alguma destas:</p>`;
+    }
+    const list = r.matches.slice(0, sure ? 3 : 6).filter((m, i) => i === 0 || m.sim >= 0.2);
+    $("f-cands").innerHTML = list.map((m, i) =>
+      `<button class="cand${sure && i === 0 ? " best" : ""}" data-pid="${m.pid}"><img src="${faceUrl(m.pid)}" alt=""><span>${label(m.pid)} · ${count(m.pid)} fotos</span></button>`).join("");
+    $("f-cands").querySelectorAll(".cand").forEach((c) => (c.onclick = () => pick(+c.dataset.pid, true)));
+    show("f-res");
+  }
+
+  function pick(pid, closeIt) {
+    state.sel = new Set([pid]);
+    update();
+    const st = document.querySelector(".stats");
+    window.scrollTo({ top: st.offsetTop + st.offsetHeight });
+    if (closeIt) close();
+  }
+})();
 
 // convite do Detach! 27: aparece ao entrar, uma vez por sessão
 (function promo() {

@@ -17,6 +17,12 @@ Depois abra http://localhost:8765. Clique num rosto para filtrar (vários = foto
 3. `.venv/bin/python -I scripts/detect.py`: detecta os rostos (YuNet) e gera os embeddings (ArcFace, em `models/`)
 4. `.venv/bin/python -I scripts/build.py`: agrupa por pessoa e gera `site/`. Ajuste `THRESHOLD` (0.6) se juntar pessoas diferentes (diminua) ou separar a mesma pessoa (aumente).
 
+5. `.venv/bin/python -I scripts/web_embed.py` e depois `.venv/bin/python -I scripts/web_export.py`: geram a busca por selfie (modelo leve MobileFaceNet + média de cada pessoa em `site/selfie-data.js`). Rodar sempre que o `build.py` rodar, senão a selfie aponta para as pessoas erradas.
+
+## Busca por selfie
+
+Roda inteira no navegador (`site/selfie.js`, com onnxruntime-web): YuNet acha o rosto, o alinhamento é o mesmo do Python e o MobileFaceNet (`site/models/mbf.onnx`, 13 MB, baixado só quando a pessoa usa a busca) gera o vetor comparado com cada pessoa. A foto não sai do aparelho. Validado: ~98% de acerto nos rostos da base; abaixo de 0,5 de similaridade a página pergunta em vez de afirmar.
+
 ## Setup numa máquina nova
 
-`cache/` e `models/` não vão para o git. Para reprocessar: `python3 -m venv .venv && .venv/bin/pip install opencv-python numpy scikit-learn onnxruntime`, baixe `face_detection_yunet_2023mar.onnx` (opencv_zoo) como `models/yunet.onnx` e o `buffalo_l.zip` (insightface v0.7) descompactado em `models/buffalo/`. Para só ver a galeria nada disso é preciso: a foto ampliada vem do Drive.
+`cache/` e `models/` não vão para o git. Para reprocessar: `python3 -m venv .venv && .venv/bin/pip install opencv-python numpy scikit-learn onnxruntime`, baixe `face_detection_yunet_2023mar.onnx` (opencv_zoo) como `models/yunet.onnx` e os `buffalo_l.zip` e `buffalo_s.zip` (insightface v0.7) descompactados em `models/buffalo/` e `models/buffalo_s/`. Para só ver a galeria nada disso é preciso: a foto ampliada vem do Drive.
