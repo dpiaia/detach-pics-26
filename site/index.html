@@ -105,6 +105,32 @@
     .stats .wrap { padding-top: 24px; padding-bottom: 24px; }
     .top h2 { display: none; } .top { gap: 10px; padding: 10px 0; }
   }
+
+  /* convite para o Detach! 27 */
+  .promo { position: fixed; inset: 0; z-index: 30; display: none; align-items: center; justify-content: center; padding: 16px; background: rgba(30,11,11,.55); }
+  .promo.on { display: flex; animation: fade .25s ease-out; }
+  .promo .card { position: relative; width: min(480px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; background: var(--bg);
+    border: 2px solid var(--black); box-shadow: 10px 10px 0 var(--pink); animation: pop .35s cubic-bezier(.2,.9,.3,1.3); }
+  .promo img { display: block; width: 100%; height: auto; background: #000; }
+  .promo .body { padding: 22px 22px 24px; }
+  .promo .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .promo .tags span { padding: 3px 8px; color: var(--black); }
+  .promo h3 { font-family: var(--wide); font-stretch: 125%; font-weight: 700; text-transform: uppercase; font-size: 26px; line-height: 1; margin: 0 0 12px; }
+  .promo p { margin: 0 0 20px; color: var(--muted); }
+  .promo p strong { color: var(--ink); }
+  .promo .cta { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; background: var(--orange); color: var(--black);
+    border: 2px solid var(--black); text-decoration: none; font-family: var(--wide); font-stretch: 125%; font-weight: 700; text-transform: uppercase; font-size: 16px;
+    transition: transform .12s, box-shadow .12s; }
+  .promo .cta:hover { transform: translate(-3px, -3px); box-shadow: 4px 4px 0 var(--black); }
+  .promo .later { display: block; width: 100%; margin-top: 10px; padding: 8px; border: 0; background: none; cursor: pointer; color: var(--muted); }
+  .promo .later:hover { color: var(--ink); text-decoration: underline; }
+  .promo .close { position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; border: 2px solid #fff; background: var(--black); color: #fff; font-size: 18px; cursor: pointer; }
+  .promo .close:hover { background: var(--orange); border-color: var(--orange); color: var(--black); }
+  .ad27 { color: var(--ink); }
+  @keyframes fade { from { opacity: 0; } }
+  @keyframes pop { from { transform: translateY(24px) scale(.96); opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .promo.on, .promo .card { animation: none; } }
+  @media (max-width: 420px) { .promo h3 { font-size: 21px; } .promo .body { padding: 18px; } .promo .card { box-shadow: 6px 6px 0 var(--pink); } }
 </style>
 </head>
 <body>
@@ -144,7 +170,21 @@
   <div class="grid" id="grid"></div>
   <div class="empty label" id="empty" hidden>Nenhuma foto com todas as pessoas selecionadas.</div>
 </main>
-<footer><div class="wrap label">Rostos agrupados automaticamente · pode haver erros</div></footer>
+<footer><div class="wrap label">Rostos agrupados automaticamente · pode haver erros · <a class="ad27" href="https://www.sympla.com.br/evento/detach-27-olinda-e-recife/3662370" target="_blank" rel="noopener">Detach! 27: ingressos à venda</a></div></footer>
+
+<div class="promo" id="promo" role="dialog" aria-modal="true" aria-labelledby="promo-title">
+  <div class="card">
+    <button class="close" id="promo-x" aria-label="Fechar">×</button>
+    <img src="img/detach27.jpg" width="900" height="642" alt="Detach! Olinda e Recife · Novembro, 2027 · Especial 5 anos">
+    <div class="body">
+      <div class="tags label"><span style="background:var(--lilac)">19 e 20 de nov · 2027</span><span style="background:var(--mint)">Olinda e Recife</span><span style="background:var(--green)">Especial 5 anos</span></div>
+      <h3 id="promo-title">Se achou nas fotos? Ano que vem tem mais.</h3>
+      <p>O Detach! faz 5 anos e muda de praia: agora em <strong>Olinda e Recife</strong>. O lote <strong>Super Antecipado</strong> já está à venda, em até 12x. Garanta o seu antes de virar foto de novo.</p>
+      <a class="cta" id="promo-cta" href="https://www.sympla.com.br/evento/detach-27-olinda-e-recife/3662370" target="_blank" rel="noopener">Garantir meu ingresso <span aria-hidden="true">↗</span></a>
+      <button class="later label" id="promo-later">Agora não, quero ver as fotos</button>
+    </div>
+  </div>
+</div>
 
 <div class="lb" id="lb" role="dialog" aria-modal="true">
   <div class="lbbar"><span id="lbtitle" class="label"></span><a id="lbdrive" class="label" target="_blank" rel="noopener">Abrir no Drive</a><span class="sp"></span><button class="x" id="lbx" aria-label="Fechar">×</button></div>
@@ -275,6 +315,32 @@ $("folders").onclick = (e) => {
   update();
 };
 update();
+
+// convite do Detach! 27: aparece ao entrar, uma vez por sessão
+(function promo() {
+  const el = $("promo");
+  let seen = false;
+  try { seen = sessionStorage.getItem("promo27") === "1"; } catch {}
+  if (seen) return;
+  let last = null;
+  const close = () => {
+    el.classList.remove("on");
+    try { sessionStorage.setItem("promo27", "1"); } catch {}
+    document.removeEventListener("keydown", onKey, true);
+    if (last) last.focus();
+  };
+  const onKey = (e) => { if (e.key === "Escape") { e.stopPropagation(); close(); } };
+  $("promo-x").onclick = close;
+  $("promo-later").onclick = close;
+  $("promo-cta").addEventListener("click", () => setTimeout(close, 0));
+  el.onclick = (e) => { if (e.target === el) close(); };
+  setTimeout(() => {
+    last = document.activeElement;
+    el.classList.add("on");
+    document.addEventListener("keydown", onKey, true);
+    $("promo-cta").focus({ preventScroll: true });
+  }, 900);
+})();
 </script>
 </body>
 </html>
