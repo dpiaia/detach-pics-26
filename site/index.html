@@ -64,6 +64,27 @@
 
   /* barra fixa: pastas, seleção e rostos */
   .bar { position: sticky; top: 0; z-index: 5; background: var(--bg); border-bottom: 2px solid var(--black); }
+  /* minibarra: só no celular, aparece quando a barra grande sai da tela */
+  .mini { display: none; }
+  @media (max-width: 700px) {
+    .bar { position: static; }
+    .mini { position: fixed; top: 0; left: 0; right: 0; z-index: 6; display: flex; align-items: center; gap: 8px; height: 54px; padding: 0 12px;
+      background: var(--bg); border-bottom: 2px solid var(--black); transform: translateY(-110%); transition: transform .2s; }
+    .mini.on { transform: none; }
+    .mini .who { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; padding: 0; border: 0; background: none; color: var(--ink); text-align: left; cursor: pointer; }
+    .mini .faces { display: flex; flex: none; }
+    .mini .faces img { width: 34px; height: 34px; object-fit: cover; border: 2px solid var(--black); }
+    .mini .faces img + img { margin-left: -12px; }
+    .mini .txt { min-width: 0; line-height: 1.15; }
+    .mini .txt b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--wide); font-stretch: 125%; font-weight: 700; font-size: 14px; text-transform: uppercase; }
+    .mini .txt span { font-family: var(--mono); font-size: 11px; text-transform: uppercase; color: var(--muted); }
+    .mini .ib { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border: 2px solid var(--black); background: var(--bg); color: var(--black); cursor: pointer; font-size: 18px; line-height: 1; }
+    .mini .ib svg { width: 18px; height: 18px; }
+    .mini .ib.love svg { fill: none; stroke: currentColor; stroke-width: 2.2; }
+    .mini .ib.love[aria-pressed="true"] { background: var(--pink); color: #fff; }
+    .mini .ib.love[aria-pressed="true"] svg { fill: currentColor; }
+    .mini .ib.x { background: var(--black); color: #fff; }
+  }
   .top { display: flex; align-items: center; gap: 16px; padding: 14px 0 12px; flex-wrap: wrap; }
   .top h2 { font-family: var(--wide); font-stretch: 125%; font-weight: 700; font-size: 18px; text-transform: uppercase; margin: 0; }
   .count { color: var(--muted); }
@@ -385,6 +406,7 @@
     <button class="more label" id="more">Ver todas as pessoas</button>
   </div>
 </div>
+<div class="mini" id="mini" aria-label="Filtro atual"></div>
 <main class="wrap">
   <div class="grid" id="grid"></div>
   <div class="empty label" id="empty" hidden>Nenhuma foto com todas as pessoas selecionadas.</div>
@@ -496,7 +518,15 @@ $("st-faces").textContent = fmt(nFaces);
 const tick = ["Detach! 26", "Fortaleza", "20, 21 e 22 de novembro", `${fmt(photos.length)} fotos`, `${fmt(people.length)} pessoas`, "Clique num rosto"];
 $("ticker").innerHTML = [...tick, ...tick, ...tick, ...tick].map((t) => `<span>${t}</span>`).join("");
 // a barra é sticky; a posição natural dela é logo abaixo da faixa de números
-const toGallery = () => { const st = document.querySelector(".stats"); const y = st.offsetTop + st.offsetHeight; if (window.scrollY > y) window.scrollTo({ top: y }); };
+const isMobile = () => matchMedia("(max-width: 700px)").matches;
+// onde começa a galeria: no computador, a barra (fixa) logo depois da faixa de amadas;
+// no celular, direto nas fotos, logo abaixo da minibarra
+function galleryTop() {
+  if (isMobile()) return $("grid").getBoundingClientRect().top + window.scrollY - 62;
+  const prev = $("loved").hidden ? document.querySelector(".stats") : $("loved");
+  return prev.offsetTop + prev.offsetHeight;
+}
+const toGallery = () => { const y = galleryTop(); if (isMobile() || window.scrollY > y) window.scrollTo({ top: y }); requestAnimationFrame(() => window.checkMini && checkMini()); };
 
 const ICON_DL = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 4v11m0 0l-5-5m5 5l5-5M5 20h14"/></svg>`;
 const ICON_SH = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 15V4m0 0L7 9m5-5l5 5M5 13v7h14v-7"/></svg>`;
@@ -587,7 +617,7 @@ const Names = (() => {
       const rows = await rpc("get_names");
       for (const k in shared) delete shared[k];
       rows.forEach((r) => { shared[r.person] = r.name; });
-      renderPeople(); renderSel();
+      renderPeople(); renderSel(); renderMini();
     } catch {}
   }
   const MSG = {
@@ -868,7 +898,43 @@ function renderGrid() {
 }
 
 function toggle(id) { state.sel.has(id) ? state.sel.delete(id) : state.sel.add(id); update(); toGallery(); }
-function update() { renderSel(); renderPeople(); renderGrid(); syncUrl(); }
+function update() { renderSel(); renderPeople(); renderGrid(); syncUrl(); renderMini(); }
+
+const ICON_CAM = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>`, ICON_PPL = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.5-3.5 3.2-5.5 6.5-5.5s6 2 6.5 5.5"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.6c2.8.1 4.9 1.8 5.4 4.9"/></svg>`;
+function renderMini() {
+  const m = $("mini"), ids = [...state.sel], k = state.list.length;
+  const fotos = `${k} foto${k === 1 ? "" : "s"}${state.folder ? " · " + state.folder : ""}${state.loved ? " · amadas" : ""}`;
+  if (ids.length) {
+    const title = ids.length === 1 ? label(ids[0]) : `${ids.length} pessoas juntas`;
+    m.innerHTML = `<button class="who" id="m-who" aria-label="Ver o filtro completo"><span class="faces">${ids.slice(0, 3).map((id) => `<img src="${faceUrl(id)}" alt="">`).join("")}</span>` +
+      `<span class="txt"><b>${title}</b><span>${fotos}</span></span></button>` +
+      `<button class="ib share" id="m-share" aria-label="Compartilhar este filtro">${ICON_SH}</button>` +
+      `<button class="ib" id="m-ppl" aria-label="Escolher pessoas">${ICON_PPL}</button>` +
+      `<button class="ib x" id="m-clr" aria-label="Limpar filtro">×</button>`;
+    $("m-share").onclick = (e) => share(filterShare(), e.currentTarget);
+    $("m-clr").onclick = () => { state.sel.clear(); update(); };
+    // tocar no nome volta para o painel completo (sugerir nome etc.)
+    $("m-who").onclick = () => window.scrollTo({ top: $("bar").offsetTop });
+  } else {
+    m.innerHTML = `<button class="who" id="m-who"><span class="txt"><b>Galeria</b><span>${fotos}</span></span></button>` +
+      `<button class="ib love" id="m-love" aria-pressed="${state.loved}" aria-label="Fotos mais amadas">${HEART}</button>` +
+      `<button class="ib" data-find="camera" aria-label="Achar minhas fotos com uma selfie">${ICON_CAM}</button>` +
+      `<button class="ib" id="m-ppl" aria-label="Escolher pessoas">${ICON_PPL}</button>`;
+    $("m-love").onclick = () => $("lovebtn").click();
+    $("m-who").onclick = () => window.scrollTo({ top: $("bar").offsetTop });
+  }
+  $("m-ppl").onclick = () => Drawer.open();
+  requestAnimationFrame(checkMini);
+}
+// mostra a minibarra quando a barra grande já saiu da tela por cima
+let miniTick = false;
+window.checkMini = checkMini;
+function checkMini() {
+  miniTick = false;
+  $("mini").classList.toggle("on", isMobile() && $("bar").getBoundingClientRect().bottom < 64);
+}
+addEventListener("scroll", () => { if (!miniTick) { miniTick = true; requestAnimationFrame(checkMini); } }, { passive: true });
+addEventListener("resize", checkMini);
 
 function openLb(i) {
   state.idx = i;
@@ -955,7 +1021,7 @@ if (state.sel.size) {
   // link com filtro: desce direto para as fotos (sem o navegador restaurar a rolagem antiga)
   history.scrollRestoration = "manual";
   const st = document.querySelector(".stats");
-  setTimeout(() => window.scrollTo({ top: st.offsetTop + st.offsetHeight }), 0);
+  setTimeout(() => { window.scrollTo({ top: galleryTop() }); requestAnimationFrame(checkMini); }, 0);
 }
 if (startPhoto) {
   const i = state.list.findIndex((p) => p.id === startPhoto);
@@ -1079,7 +1145,7 @@ addEventListener("hashchange", () => {
     state.sel = new Set([pid]);
     update();
     const st = document.querySelector(".stats");
-    window.scrollTo({ top: st.offsetTop + st.offsetHeight });
+    window.scrollTo({ top: galleryTop() });
     if (closeIt) close();
   }
 })();
