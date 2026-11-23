@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Quem está na foto · Detach! 26</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23000'/%3E%3Cpath d='M16 26s-9-5.5-11.5-11C3 11 5.4 6 10 6c2.7 0 4.3 1.5 6 3.6C17.7 7.5 19.3 6 22 6c4.6 0 7 5 5.5 9C25 20.5 16 26 16 26z' fill='%23ff0095'/%3E%3C/svg%3E">
 <meta name="description" content="Galeria do Detach! 26 em Fortaleza: clique num rosto e veja só as fotos dessa pessoa.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Quem está na foto · Detach! 26">
@@ -108,6 +109,45 @@
   .ph .open { display: block; width: 100%; padding: 0; border: 0; background: none; cursor: zoom-in; }
   .ph img { display: block; width: 100%; height: auto; transition: transform .3s; }
   .ph:hover img { transform: scale(1.03); }
+  .heart { position: absolute; right: 8px; bottom: 8px; display: inline-flex; align-items: center; gap: 5px; padding: 5px 9px; border: 2px solid var(--black);
+    background: var(--bg); color: var(--black); cursor: pointer; font-family: var(--mono); font-size: 12px; line-height: 1; transition: transform .12s; }
+  .heart svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2.2; }
+  .heart:hover { transform: scale(1.08); }
+  .heart.on { background: var(--pink); color: #fff; }
+  .heart.on svg { fill: currentColor; }
+  .heart span:empty { display: none; }
+  .heart.pop svg { animation: pop .35s ease-out; }
+  @keyframes pop { 40% { transform: scale(1.5); } }
+  .rank { position: absolute; left: 0; top: 0; padding: 4px 10px; background: var(--black); color: #fff; font-family: var(--wide); font-stretch: 125%; font-weight: 700; font-size: 16px; }
+  .rank.r1 { background: var(--orange); color: var(--black); }
+  .rank.r2 { background: var(--lilac); color: var(--black); }
+  .rank.r3 { background: var(--green); color: var(--black); }
+  .top .lovebtn[aria-pressed="true"] { background: var(--pink); color: #fff; }
+  .top .lovebtn svg { fill: none; stroke: currentColor; stroke-width: 2.2; }
+  .top .lovebtn[aria-pressed="true"] svg { fill: currentColor; }
+  .lbbar .heart { position: static; border-color: #fff; background: var(--black); color: #fff; padding: 6px 10px; }
+  .lbbar .heart.on { background: var(--pink); border-color: var(--pink); }
+  .burst { position: absolute; left: 50%; top: 50%; width: 120px; height: 120px; margin: -60px 0 0 -60px; pointer-events: none; color: var(--pink); opacity: 0; }
+  .burst svg { width: 100%; height: 100%; fill: currentColor; filter: drop-shadow(0 4px 16px rgba(0,0,0,.4)); }
+  .burst.go { animation: burst .8s ease-out; }
+  @keyframes burst { 0% { opacity: 0; transform: scale(.4); } 25% { opacity: 1; transform: scale(1.1); } 70% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.2); } }
+
+  /* faixa "Fotos mais amadas" */
+  .loved { padding: 28px 0 8px; }
+  .loved[hidden] { display: none; }
+  .loved .head { display: flex; align-items: baseline; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+  .loved h2 { font-family: var(--wide); font-stretch: 125%; font-weight: 700; text-transform: uppercase; font-size: clamp(22px, 3vw, 34px); margin: 0; }
+  .loved h2 em { font-style: normal; color: var(--pink); }
+  .strip { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(150px, 1fr); gap: 8px; overflow-x: auto; padding-bottom: 6px; scrollbar-width: thin; }
+  .strip button { position: relative; padding: 0; border: 2px solid var(--black); background: var(--line); cursor: pointer; aspect-ratio: 4 / 5; overflow: hidden; }
+  .strip img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s; }
+  .strip button:hover img { transform: scale(1.05); }
+  .strip .rank { font-size: 14px; padding: 3px 8px; }
+  .strip button:nth-child(1) .rank { background: var(--orange); color: var(--black); }
+  .strip button:nth-child(2) .rank { background: var(--lilac); color: var(--black); }
+  .strip button:nth-child(3) .rank { background: var(--green); color: var(--black); }
+  .strip .cnt { position: absolute; right: 6px; bottom: 6px; display: inline-flex; gap: 4px; align-items: center; padding: 3px 7px; background: var(--pink); color: #fff; font-family: var(--mono); font-size: 12px; }
+  .strip .cnt svg { width: 13px; height: 13px; fill: currentColor; }
   .ph .fn { position: absolute; left: 0; bottom: 0; color: var(--black); background: var(--mint); padding: 3px 8px; opacity: 0; transition: opacity .15s; }
   .ph:hover .fn, .ph:focus-within .fn { opacity: 1; }
   /* ações da foto: aparecem ao passar o mouse; no toque ficam na foto ampliada */
@@ -126,7 +166,8 @@
   @media (max-width: 700px) {
     .lbbar { padding-right: 66px; }
     .lb .x { position: absolute; top: 10px; right: 12px; }
-    .lbacts { position: fixed; left: 16px; right: 16px; bottom: 16px; display: grid; grid-template-columns: 1fr 1fr; }
+    .lbacts { position: fixed; left: 16px; right: 16px; bottom: 16px; display: grid; grid-template-columns: auto 1fr 1fr; }
+    .lbacts .heart { padding: 10px 14px; justify-content: center; }
     .lbacts .act { justify-content: center; padding: 13px 10px; font-size: 12px; }
     .hint { display: none; }
   }
@@ -237,7 +278,9 @@
   .cand.best { box-shadow: 4px 4px 0 var(--green); }
   .badge { display: inline-block; padding: 2px 8px; font-family: var(--mono); font-size: 11px; text-transform: uppercase; color: var(--black); }
   .fmodal .err { color: var(--ink); background: #ffe1d9; padding: 10px 12px; border: 2px solid var(--orange); }
-  @media (max-width: 700px) { .top .btn.findbtn { margin-left: 0; } .top .btn.findbtn span { display: none; } }
+  .top .btn.lovebtn { margin-left: auto; }
+  .top .btn.lovebtn + .findbtn { margin-left: 0; }
+  @media (max-width: 700px) { .top .btn.lovebtn { margin-left: 0; } .top .btn.findbtn span, .top .btn.lovebtn span { display: none; } }
 </style>
 </head>
 <body>
@@ -265,11 +308,16 @@
     <div><b id="st-faces"></b><span>Rostos</span></div>
   </div>
 </section>
+<section class="wrap loved" id="loved" hidden>
+  <div class="head"><h2>Fotos mais <em>amadas</em></h2><button class="btn" id="loved-all">Ver o ranking completo →</button></div>
+  <div class="strip" id="strip"></div>
+</section>
 <div class="bar" id="bar">
   <div class="wrap">
     <div class="top">
       <h2>Galeria</h2>
       <span class="count label" id="count"></span>
+      <button class="btn lovebtn" id="lovebtn" aria-pressed="false" title="Fotos mais amadas"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.5 2.9 4.5 6.8 4.5c2.2 0 3.6 1.2 5.2 3 1.6-1.8 3-3 5.2-3 3.9 0 5.9 4 4.4 7.3C19.5 16.4 12 21 12 21z"/></svg><span>Mais amadas</span></button>
       <button class="btn findbtn" data-find="camera" title="Achar minhas fotos com uma selfie"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>Buscar por selfie</span></button>
       <div class="seg label" id="folders">
         <button data-f="" aria-pressed="true">Todas</button>
@@ -303,9 +351,9 @@
 </div>
 
 <div class="lb" id="lb" role="dialog" aria-modal="true">
-  <div class="lbbar"><span id="lbtitle" class="label"></span><a id="lbdrive" class="label" target="_blank" rel="noopener">Abrir no Drive</a><span class="sp"></span><span class="lbacts"><a class="act" id="lbdl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 4v11m0 0l-5-5m5 5l5-5M5 20h14"/></svg> Baixar</a><button class="act share" id="lbshare"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 15V4m0 0L7 9m5-5l5 5M5 13v7h14v-7"/></svg> Compartilhar</button></span><button class="x" id="lbx" aria-label="Fechar">×</button></div>
+  <div class="lbbar"><span id="lbtitle" class="label"></span><a id="lbdrive" class="label" target="_blank" rel="noopener">Abrir no Drive</a><span class="sp"></span><span class="lbacts"><button class="heart" id="lbheart" aria-label="Curtir"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.5 2.9 4.5 6.8 4.5c2.2 0 3.6 1.2 5.2 3 1.6-1.8 3-3 5.2-3 3.9 0 5.9 4 4.4 7.3C19.5 16.4 12 21 12 21z"/></svg><span></span></button><a class="act" id="lbdl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 4v11m0 0l-5-5m5 5l5-5M5 20h14"/></svg> Baixar</a><button class="act share" id="lbshare"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 15V4m0 0L7 9m5-5l5 5M5 13v7h14v-7"/></svg> Compartilhar</button></span><button class="x" id="lbx" aria-label="Fechar">×</button></div>
   <button class="nav prev" id="lbprev" aria-label="Anterior">‹</button>
-  <div class="stage" id="stage"><img id="lbimg" alt=""></div>
+  <div class="stage" id="stage"><img id="lbimg" alt=""><div class="burst" id="burst"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.5 2.9 4.5 6.8 4.5c2.2 0 3.6 1.2 5.2 3 1.6-1.8 3-3 5.2-3 3.9 0 5.9 4 4.4 7.3C19.5 16.4 12 21 12 21z"/></svg></div></div>
   <button class="nav next" id="lbnext" aria-label="Próxima">›</button>
   <div class="hint label">Clique num rosto para ver só as fotos dessa pessoa · ← → navegam · Esc fecha</div>
 </div>
@@ -363,7 +411,7 @@ const store = { get(k, d) { try { return JSON.parse(localStorage.getItem(k)) ?? 
 const names = store.get("names", {});      // nomes que você deu neste navegador (antigo)
 const shared = {};                          // nomes confirmados por todos (Supabase)
 const esc = (t) => String(t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const state = { sel: new Set(), folder: "", list: [], idx: -1 };
+const state = { sel: new Set(), folder: "", list: [], idx: -1, loved: false };
 const $ = (id) => document.getElementById(id);
 const faceUrl = (pid) => `faces/p${pid}.jpg`;
 const nameOf = (pid) => shared[pid] || names[pid] || "";
@@ -390,6 +438,7 @@ function hashFor(photo) {
   const q = new URLSearchParams();
   if (state.sel.size) q.set("pessoas", [...state.sel].map((id) => id + 1).join(","));
   if (state.folder) q.set("pasta", state.folder);
+  if (state.loved) q.set("ordem", "amadas");
   if (photo) q.set("foto", photo.id);
   const h = q.toString().replace(/%2C/g, ",");
   return h ? "#" + h : "";
@@ -404,6 +453,8 @@ function readUrl() {
   const ids = (q.get("pessoas") || "").split(",").map((x) => parseInt(x, 10) - 1).filter((id) => people[id]);
   state.sel = new Set(ids);
   state.folder = ["D1", "D2"].includes(q.get("pasta")) ? q.get("pasta") : "";
+  state.loved = q.get("ordem") === "amadas";
+  $("lovebtn").setAttribute("aria-pressed", state.loved);
   $("folders").querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x.dataset.f === state.folder));
   return q.get("foto");
 }
@@ -535,8 +586,71 @@ const Names = (() => {
       load();
     };
   }
-  return { on, load, panel, offerLocal };
+  return { on, load, panel, offerLocal, rpc, cid };
 })();
+
+// ---------- curtidas
+const HEART = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.5 2.9 4.5 6.8 4.5c2.2 0 3.6 1.2 5.2 3 1.6-1.8 3-3 5.2-3 3.9 0 5.9 4 4.4 7.3C19.5 16.4 12 21 12 21z"/></svg>`;
+const Likes = (() => {
+  const counts = {}, mine = new Set();
+  const n = (id) => counts[id] || 0;
+  async function load() {
+    if (!Names.on) return;
+    try {
+      const [all, my] = await Promise.all([Names.rpc("get_like_counts"), Names.rpc("get_my_likes", { p_client: Names.cid })]);
+      all.forEach((r) => { counts[r.photo_id] = r.likes; });
+      my.forEach((r) => mine.add(r.photo_id));
+      paintAll(); renderLoved();
+      if (state.loved) renderGrid();
+    } catch {}
+  }
+  function paint(btn, id) {
+    btn.classList.toggle("on", mine.has(id));
+    btn.querySelector("span").textContent = n(id) || "";
+    btn.setAttribute("aria-pressed", mine.has(id));
+    btn.setAttribute("aria-label", (mine.has(id) ? "Descurtir" : "Curtir") + (n(id) ? ` (${n(id)})` : ""));
+  }
+  function paintAll() {
+    document.querySelectorAll("[data-heart]").forEach((b) => paint(b, b.dataset.heart));
+  }
+  async function toggle(id, force) {
+    if (!Names.on) return;
+    const want = force ?? !mine.has(id);
+    if (want === mine.has(id)) return;
+    // otimista: muda na hora, corrige com a resposta do banco
+    want ? mine.add(id) : mine.delete(id);
+    counts[id] = Math.max(0, n(id) + (want ? 1 : -1));
+    document.querySelectorAll(`[data-heart="${id}"]`).forEach((b) => { paint(b, id); if (want) { b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop"); } });
+    renderLoved();
+    try {
+      const total = await Names.rpc("like_photo", { p_photo: id, p_client: Names.cid, p_on: want });
+      if (total >= 0) { counts[id] = total; document.querySelectorAll(`[data-heart="${id}"]`).forEach((b) => paint(b, id)); renderLoved(); }
+    } catch {
+      want ? mine.delete(id) : mine.add(id);
+      counts[id] = Math.max(0, n(id) + (want ? -1 : 1));
+      document.querySelectorAll(`[data-heart="${id}"]`).forEach((b) => paint(b, id));
+    }
+  }
+  const button = (id) => `<button class="heart" data-heart="${id}" aria-label="Curtir">${HEART}<span>${n(id) || ""}</span></button>`;
+  return { n, mine, load, toggle, button, paint };
+})();
+
+// ranking: as fotos com mais corações (desempate: a que chegou lá primeiro na galeria)
+const ranked = () => photos.filter((p) => Likes.n(p.id) > 0).sort((a, b) => Likes.n(b.id) - Likes.n(a.id));
+function renderLoved() {
+  const top = ranked().slice(0, 10);
+  $("loved").hidden = top.length === 0;
+  $("strip").innerHTML = top.map((p, i) =>
+    `<button data-id="${p.id}" aria-label="#${i + 1}, ${Likes.n(p.id)} corações"><img loading="lazy" src="thumbs/${p.id}.jpg" alt=""><span class="rank">#${i + 1}</span><span class="cnt">${HEART}${Likes.n(p.id)}</span></button>`).join("");
+  $("strip").querySelectorAll("button").forEach((b) => (b.onclick = () => {
+    state.loved = true; state.sel.clear(); state.folder = "";
+    $("lovebtn").setAttribute("aria-pressed", true);
+    $("folders").querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x.dataset.f === ""));
+    update();
+    const i = state.list.findIndex((p) => p.id === b.dataset.id);
+    if (i >= 0) openLb(i);
+  }));
+}
 
 function renderPeople() {
   const box = $("people");
@@ -575,21 +689,28 @@ function renderSel() {
 }
 
 function renderGrid() {
-  state.list = photos.filter((p) => (!state.folder || p.f === state.folder) && [...state.sel].every((s) => p.ppl.has(s)));
+  const base = state.loved ? ranked() : photos;
+  state.list = base.filter((p) => (!state.folder || p.f === state.folder) && [...state.sel].every((s) => p.ppl.has(s)));
   const g = $("grid");
   g.innerHTML = "";
   const frag = document.createDocumentFragment();
+  const rk = state.loved ? new Map(ranked().map((p, i) => [p.id, i + 1])) : null;
   state.list.forEach((p, i) => {
     const d = document.createElement("div");
     d.className = "ph";
     d.innerHTML = `<button class="open" aria-label="Ampliar ${p.t}"><img loading="lazy" decoding="async" src="thumbs/${p.id}.jpg" width="${p.w}" height="${p.h}" alt="${p.t}"><span class="fn">${p.f} · ${p.t.replace(/\.jpe?g$/i, "")}</span></button>` +
-      `<div class="acts"><a class="act" href="${dlUrl(p)}" download="${p.t}">${ICON_DL} Baixar</a><button class="act share">${ICON_SH} Compartilhar</button></div>`;
+      `<div class="acts"><a class="act" href="${dlUrl(p)}" download="${p.t}">${ICON_DL} Baixar</a><button class="act share">${ICON_SH} Compartilhar</button></div>` +
+      (Names.on ? Likes.button(p.id) : "") +
+      (rk ? `<span class="rank r${rk.get(p.id)}">#${rk.get(p.id)}</span>` : "");
     d.querySelector(".open").onclick = () => openLb(i);
+    const h = d.querySelector(".heart");
+    if (h) { Likes.paint(h, p.id); h.onclick = () => Likes.toggle(p.id); }
     d.querySelector(".share").onclick = (e) => share(photoShare(p), e.currentTarget);
     frag.appendChild(d);
   });
   g.appendChild(frag);
   $("empty").hidden = state.list.length > 0;
+  $("empty").textContent = state.loved ? "Nenhuma foto com coração por aqui ainda. Abra uma foto e toque no ♥." : "Nenhuma foto com todas as pessoas selecionadas.";
   $("count").textContent = `${state.list.length} de ${photos.length} fotos · ${people.length} pessoas`;
 }
 
@@ -610,6 +731,10 @@ function openLb(i) {
   $("lbdl").href = dlUrl(p);
   $("lbdl").setAttribute("download", p.t);
   $("lbshare").onclick = (e) => share(photoShare(p), e.currentTarget);
+  const lh = $("lbheart");
+  lh.hidden = !Names.on;
+  lh.dataset.heart = p.id; Likes.paint(lh, p.id);
+  lh.onclick = () => Likes.toggle(p.id);
   syncUrl();
   const stage = $("stage");
   stage.querySelectorAll(".box").forEach((b) => b.remove());
@@ -650,6 +775,23 @@ $("folders").onclick = (e) => {
   update();
 };
 Names.load().then(() => setTimeout(Names.offerLocal, 2500));
+Likes.load();
+$("lovebtn").onclick = () => {
+  state.loved = !state.loved;
+  $("lovebtn").setAttribute("aria-pressed", state.loved);
+  update(); toGallery();
+};
+$("loved-all").onclick = () => {
+  state.loved = true; $("lovebtn").setAttribute("aria-pressed", true);
+  update();
+  window.scrollTo({ top: $("loved").offsetTop + $("loved").offsetHeight });
+};
+// duplo clique (ou toque duplo) na foto ampliada = coração
+$("lbimg").addEventListener("dblclick", () => {
+  const p = state.list[state.idx]; if (!p || !Names.on) return;
+  Likes.toggle(p.id, true);
+  const b = $("burst"); b.classList.remove("go"); void b.offsetWidth; b.classList.add("go");
+});
 
 // abre com o filtro e a foto que vieram no link
 const startPhoto = readUrl();
