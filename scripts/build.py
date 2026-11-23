@@ -78,9 +78,10 @@ for i, f in enumerate(faces):
     faces_by_photo.setdefault(f["photo"], []).append(
         [round(v, 4) for v in f["box"]] + [face_person.get(i, -1)])
 
+size_of = {f["id"]: f.get("size", 0) for f in json.loads((ROOT / "data" / "files.json").read_text())}
 data = {
     "people": [{"id": pid, "n": p["n"]} for pid, p in enumerate(people)],
-    "photos": [{"id": p["id"], "t": p["title"], "f": p["folder"], "w": p["w"], "h": p["h"],
+    "photos": [{"id": p["id"], "t": p["title"], "f": p["folder"], "w": p["w"], "h": p["h"], "s": size_of.get(p["id"], 0),
                 "faces": faces_by_photo.get(p["id"], [])} for p in photos],
 }
 (SITE / "data.js").write_text("window.DATA=" + json.dumps(data, separators=(",", ":")) + ";")

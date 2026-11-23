@@ -347,6 +347,21 @@
   .cand.best { box-shadow: 4px 4px 0 var(--green); }
   .badge { display: inline-block; padding: 2px 8px; font-family: var(--mono); font-size: 11px; text-transform: uppercase; color: var(--black); }
   .fmodal .err { color: var(--ink); background: #ffe1d9; padding: 10px 12px; border: 2px solid var(--orange); }
+  .top .btn.dlbtn { margin-left: auto; }
+  .top .btn.dlbtn + .lovebtn { margin-left: 0; }
+  .opts { display: grid; gap: 8px; margin: 4px 0 14px; }
+  .opt { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 2px solid var(--black); background: var(--bg); cursor: pointer; text-align: left; color: var(--ink); }
+  .opt b { display: block; font-size: 15px; }
+  .opt small { color: var(--muted); }
+  .opt .dot { width: 18px; height: 18px; flex: none; border: 2px solid var(--black); border-radius: 50%; }
+  .opt[aria-checked="true"] { background: var(--mint); box-shadow: 4px 4px 0 var(--black); }
+  .opt[aria-checked="true"] .dot { background: var(--black); box-shadow: inset 0 0 0 3px var(--mint); }
+  .opt .sz { margin-left: auto; font-family: var(--mono); font-size: 12px; white-space: nowrap; }
+  .zwarn { margin: 0 0 12px; padding: 10px 12px; background: #fff4c2; border: 2px solid var(--black); font-size: 14px; }
+  .prog { height: 14px; border: 2px solid var(--black); background: var(--bg); margin: 8px 0 10px; }
+  .prog i { display: block; height: 100%; width: 0; background: var(--green); transition: width .2s; }
+  #zmodal .row .btn { flex: 1; justify-content: center; }
+  @media (max-width: 700px) { .top .btn.dlbtn { margin-left: 0; } .top .btn.dlbtn span { display: none; } }
   .top .btn.lovebtn { margin-left: auto; }
   .top .btn.lovebtn + .findbtn { margin-left: 0; }
   @media (max-width: 700px) { .top .btn.lovebtn { margin-left: 0; } .top .btn.findbtn span, .top .btn.lovebtn span { display: none; } }
@@ -393,6 +408,7 @@
     <div class="top">
       <h2>Galeria</h2>
       <span class="count label" id="count"></span>
+      <button class="btn dlbtn" id="dlbtn" title="Baixar as fotos deste filtro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 4v11m0 0l-5-5m5 5l5-5M5 20h14"/></svg><span id="dlbtn-t">Baixar</span></button>
       <button class="btn lovebtn" id="lovebtn" aria-pressed="false" title="Fotos mais amadas"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.5 2.9 4.5 6.8 4.5c2.2 0 3.6 1.2 5.2 3 1.6-1.8 3-3 5.2-3 3.9 0 5.9 4 4.4 7.3C19.5 16.4 12 21 12 21z"/></svg><span>Mais amadas</span></button>
       <button class="btn findbtn" data-find="camera" title="Achar minhas fotos com uma selfie"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><span>Buscar por selfie</span></button>
       <div class="seg label" id="folders">
@@ -443,6 +459,31 @@
   <button id="sh-copy" role="menuitem"><span class="dot" style="background:var(--pink)"></span><span>Copiar link</span></button>
 </div>
 
+<div class="fmodal" id="zmodal" role="dialog" aria-modal="true" aria-labelledby="z-title">
+  <div class="card">
+    <button class="close" id="z-x" aria-label="Fechar">×</button>
+    <h3 id="z-title">Baixar fotos</h3>
+    <div class="fstep" id="z-pick">
+      <p id="z-desc"></p>
+      <div class="opts" role="radiogroup">
+        <button class="opt" role="radio" data-q="orig" aria-checked="true"><span class="dot"></span><span><b>Originais</b><small>resolução cheia, como no Drive</small></span><span class="sz" id="z-sz-orig"></span></button>
+        <button class="opt" role="radio" data-q="leve" aria-checked="false"><span class="dot"></span><span><b>Leves</b><small>2.000 px, boas para redes sociais</small></span><span class="sz" id="z-sz-leve"></span></button>
+      </div>
+      <div class="zwarn" id="z-warn" hidden></div>
+      <div class="row"><button class="btn primary" id="z-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M12 4v11m0 0l-5-5m5 5l5-5M5 20h14"/></svg> Baixar ZIP</button></div>
+    </div>
+    <div class="fstep" id="z-run">
+      <p id="z-status">Preparando…</p>
+      <div class="prog"><i id="z-bar"></i></div>
+      <p class="label" id="z-note">Deixe esta aba aberta até terminar.</p>
+      <div class="row"><button class="btn" id="z-cancel">Cancelar</button></div>
+    </div>
+    <div class="fstep" id="z-done">
+      <p id="z-result"></p>
+      <div class="row"><button class="btn primary" id="z-ok">Fechar</button></div>
+    </div>
+  </div>
+</div>
 <div class="fmodal" id="fmodal" role="dialog" aria-modal="true" aria-labelledby="f-title">
   <div class="card">
     <button class="close" id="f-x" aria-label="Fechar">×</button>
@@ -895,12 +936,133 @@ function renderGrid() {
   $("empty").hidden = state.list.length > 0;
   $("empty").textContent = state.loved ? "Nenhuma foto com coração por aqui ainda. Abra uma foto e toque no ♥." : "Nenhuma foto com todas as pessoas selecionadas.";
   $("count").textContent = `${state.list.length} de ${photos.length} fotos · ${people.length} pessoas`;
+  $("dlbtn-t").textContent = `Baixar ${state.list.length}`;
+  $("dlbtn").disabled = state.list.length === 0;
 }
 
 function toggle(id) { state.sel.has(id) ? state.sel.delete(id) : state.sel.add(id); update(); toGallery(); }
 function update() { renderSel(); renderPeople(); renderGrid(); syncUrl(); renderMini(); }
 
 const ICON_CAM = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>`, ICON_PPL = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.5-3.5 3.2-5.5 6.5-5.5s6 2 6.5 5.5"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.6c2.8.1 4.9 1.8 5.4 4.9"/></svg>`;
+// ---------- baixar todas as fotos do filtro em um ZIP (montado no navegador)
+const Zip = (() => {
+  const modal = $("zmodal"), fmt = (b) => b >= 1e9 ? (b / 1e9).toFixed(1).replace(".", ",") + " GB" : Math.max(1, Math.round(b / 1e6)) + " MB";
+  const LEVE = 950e3; // tamanho médio de uma foto em 2.000 px (medido)
+  const canStream = "showSaveFilePicker" in window;
+  let q = "orig", ctrl = null;
+  const show = (id) => { ["z-pick", "z-run", "z-done"].forEach((s) => $(s).classList.toggle("on", s === id)); modal.classList.add("on"); };
+  const close = () => { if (ctrl) ctrl.abort(); modal.classList.remove("on"); };
+  function desc() {
+    const ids = [...state.sel];
+    const parts = [];
+    if (ids.length) parts.push(ids.length === 1 ? labelText(ids[0]) : ids.map(labelText).join(" + "));
+    if (state.loved) parts.push("mais amadas");
+    if (state.folder) parts.push(state.folder);
+    return parts.join(" · ") || "todas";
+  }
+  const slug = (t) => t.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60) || "fotos";
+  function sizes() {
+    const list = state.list;
+    return { n: list.length, orig: list.reduce((a, p) => a + (p.s || 2.3e6), 0), leve: list.length * LEVE };
+  }
+  function pick(v) {
+    q = v;
+    modal.querySelectorAll(".opt").forEach((o) => o.setAttribute("aria-checked", o.dataset.q === v));
+    const { orig } = sizes(), w = $("z-warn");
+    const big = !canStream && v === "orig" && orig > 600e6;
+    w.hidden = !big && !(state.list.length > 400);
+    w.textContent = big ? `São ${fmt(orig)}: no celular um ZIP desse tamanho pode travar o navegador. As leves dão conta para guardar e postar.`
+      : `São muitas fotos (${state.list.length}). Pode levar alguns minutos.`;
+  }
+  function open() {
+    const { n, orig, leve } = sizes();
+    if (!n) return;
+    $("z-title").textContent = `Baixar ${n} foto${n === 1 ? "" : "s"}`;
+    $("z-desc").textContent = `Filtro: ${desc()}. Vai tudo num arquivo ZIP.`;
+    $("z-sz-orig").textContent = "~" + fmt(orig);
+    $("z-sz-leve").textContent = "~" + fmt(leve);
+    pick(!canStream && orig > 600e6 ? "leve" : "orig");
+    show("z-pick");
+  }
+  modal.querySelectorAll(".opt").forEach((o) => (o.onclick = () => pick(o.dataset.q)));
+  $("z-x").onclick = close; $("z-ok").onclick = close;
+  $("z-cancel").onclick = () => { if (ctrl) ctrl.abort(); };
+  modal.addEventListener("click", (e) => { if (e.target === modal && !ctrl) close(); });
+
+  $("z-go").onclick = async () => {
+    const list = state.list.slice(), name = `detach26-${slug(desc())}${q === "leve" ? "-leves" : ""}.zip`;
+    const dir = `Detach! 26 - ${desc().replace(/[\\/:*?"<>|]/g, "-")}`;
+    let file = null;
+    // no Chrome/Edge do computador, grava direto no disco (precisa ser pedido no clique)
+    if (canStream) {
+      try { file = await showSaveFilePicker({ suggestedName: name, types: [{ description: "ZIP", accept: { "application/zip": [".zip"] } }] }); }
+      catch (e) { if (e.name === "AbortError") return; file = null; }
+    }
+    ctrl = new AbortController();
+    const signal = ctrl.signal;
+    show("z-run");
+    $("z-status").textContent = "Preparando…";
+    let done = 0, bytes = 0, failed = [];
+    const progress = () => {
+      $("z-status").textContent = `${done} de ${list.length} fotos · ${fmt(bytes)}`;
+      $("z-bar").style.width = (100 * done / list.length) + "%";
+    };
+    // o link de download do Drive recusa pedidos de página (403); o servidor de imagens do Google
+    // entrega a mesma foto em resolução cheia (=s0) e libera CORS
+    const url = (p) => `https://lh3.googleusercontent.com/d/${p.id}=${q === "orig" ? "s0" : "w2000"}`;
+    async function get(p) {
+      for (let t = 0; t < 3; t++) {
+        try {
+          const r = await fetch(url(p), { signal, referrerPolicy: "no-referrer" });
+          if (!r.ok) throw new Error(r.status);
+          return await r.blob();
+        } catch (e) { if (signal.aborted) throw e; await new Promise((ok) => setTimeout(ok, 800 * (t + 1))); }
+      }
+      return null;
+    }
+    // baixa 8 de cada vez, mas entrega ao ZIP na ordem
+    async function* entries() {
+      const W = 8, pending = [];
+      let i = 0;
+      const next = () => { if (i < list.length) { const p = list[i++]; pending.push(get(p).then((b) => ({ p, b }))); } };
+      for (let k = 0; k < W; k++) next();
+      while (pending.length) {
+        const { p, b } = await pending.shift();
+        next();
+        done++;
+        if (!b) { failed.push(p.t); progress(); continue; }
+        bytes += b.size; progress();
+        yield { name: `${dir}/${p.t}`, lastModified: new Date(), input: b };
+      }
+    }
+    try {
+      const { downloadZip } = await import("https://cdn.jsdelivr.net/npm/client-zip@2.4.5/index.js");
+      const zip = downloadZip(entries());
+      if (file) {
+        await zip.body.pipeTo(await file.createWritable(), { signal });
+      } else {
+        const blob = await zip.blob();
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob); a.download = name;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 60000);
+      }
+      const ok = list.length - failed.length;
+      $("z-title").textContent = "Pronto!";
+      $("z-result").innerHTML = `${ok} foto${ok === 1 ? "" : "s"} no arquivo <b>${esc(name)}</b> (${fmt(bytes)}).` +
+        (failed.length ? `<br><br>${failed.length} não ${failed.length === 1 ? "baixou" : "baixaram"} e ${failed.length === 1 ? "ficou" : "ficaram"} de fora: ${failed.slice(0, 5).map(esc).join(", ")}${failed.length > 5 ? "…" : ""}. Tente de novo mais tarde.` : "");
+    } catch (e) {
+      $("z-title").textContent = signal.aborted ? "Cancelado" : "Não deu certo";
+      $("z-result").textContent = signal.aborted ? "O download foi cancelado." : "Não consegui montar o ZIP. Confira a conexão e tente de novo, ou escolha as fotos leves.";
+    } finally {
+      ctrl = null;
+      show("z-done");
+    }
+  };
+  return { open };
+})();
+$("dlbtn").onclick = () => Zip.open();
+
 function renderMini() {
   const m = $("mini"), ids = [...state.sel], k = state.list.length;
   const fotos = `${k} foto${k === 1 ? "" : "s"}${state.folder ? " · " + state.folder : ""}${state.loved ? " · amadas" : ""}`;
@@ -908,6 +1070,7 @@ function renderMini() {
     const title = ids.length === 1 ? label(ids[0]) : `${ids.length} pessoas juntas`;
     m.innerHTML = `<button class="who" id="m-who" aria-label="Ver o filtro completo"><span class="faces">${ids.slice(0, 3).map((id) => `<img src="${faceUrl(id)}" alt="">`).join("")}</span>` +
       `<span class="txt"><b>${title}</b><span>${fotos}</span></span></button>` +
+      `<button class="ib" id="m-dl" aria-label="Baixar as fotos deste filtro">${ICON_DL}</button>` +
       `<button class="ib share" id="m-share" aria-label="Compartilhar este filtro">${ICON_SH}</button>` +
       `<button class="ib" id="m-ppl" aria-label="Escolher pessoas">${ICON_PPL}</button>` +
       `<button class="ib x" id="m-clr" aria-label="Limpar filtro">×</button>`;
@@ -924,6 +1087,7 @@ function renderMini() {
     $("m-who").onclick = () => window.scrollTo({ top: $("bar").offsetTop });
   }
   $("m-ppl").onclick = () => Drawer.open();
+  if ($("m-dl")) $("m-dl").onclick = () => Zip.open();
   requestAnimationFrame(checkMini);
 }
 // mostra a minibarra quando a barra grande já saiu da tela por cima
