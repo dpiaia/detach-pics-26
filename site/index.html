@@ -540,7 +540,7 @@ const Names = (() => {
     const sugs = list.filter((s) => s.id != null);
     el.innerHTML =
       (sugs.length ? `<span class="lab">Quem é?</span>` + sugs.map((s) =>
-        `<span class="sug" data-id="${s.id}"><b class="${s.visible ? "ok" : ""}" title="${s.visible ? "Confirmado" : "Precisa de mais votos para aparecer"}">${esc(s.name)}</b><span class="sc">${s.score > 0 ? "+" : ""}${s.score}</span>` +
+        `<span class="sug" data-id="${s.id}"><b class="${shared[pid] === s.name ? "ok" : ""}" title="${shared[pid] === s.name ? "É o nome que aparece para todos" : "Vote 👍 se este for o nome certo"}">${esc(s.name)}</b><span class="sc">${s.score > 0 ? "+" : ""}${s.score}</span>` +
         `<button class="up${s.my_vote === 1 ? " on" : ""}" data-v="1" aria-label="Esse nome está certo">👍</button>` +
         `<button class="down${s.my_vote === -1 ? " on" : ""}" data-v="-1" aria-label="Esse nome está errado">👎</button></span>`).join("")
         : `<span class="lab">Ninguém deu nome ainda.</span>`) +
@@ -559,7 +559,7 @@ const Names = (() => {
       try { r = await rpc("suggest_name", { p_person: pid, p_name: v, p_client: cid }); } catch {}
       if (r !== "ok") { $("sugmsg").textContent = MSG[r] || "Não deu para enviar agora."; return; }
       await load(); await panel(pid, el);
-      $("sugmsg").textContent = shared[pid] ? "Valeu!" : "Valeu! O nome aparece para todos quando mais alguém confirmar.";
+      $("sugmsg").textContent = shared[pid] && shared[pid] !== v ? "Valeu! Se o seu nome for o certo, peça para alguém votar 👍 nele." : "Valeu! O nome já aparece para todo mundo.";
     };
     el.querySelector("#rm").onclick = async () => {
       if (!confirm("Esconder o nome dessa pessoa para todo mundo? As fotos continuam na galeria, só sem nome.")) return;
@@ -581,7 +581,7 @@ const Names = (() => {
       $("t-yes").disabled = true;
       for (const pid of ids) { try { await rpc("suggest_name", { p_person: +pid, p_name: names[pid], p_client: cid }); } catch {} }
       store.set("namesOffered", true);
-      t.innerHTML = `<p>Enviado, valeu! Os nomes aparecem para todos quando mais alguém confirmar.</p>`;
+      t.innerHTML = `<p>Enviado, valeu! Os nomes já aparecem para todo mundo.</p>`;
       setTimeout(() => t.classList.remove("on"), 3500);
       load();
     };

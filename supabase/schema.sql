@@ -6,9 +6,10 @@
 -- votar e pedir remoção, mas não consegue ler, apagar ou editar nada direto.
 --
 -- Regras:
---   * um nome aparece para todos quando tem saldo de votos >= 2, ou quando você
---     marca a sugestão como 'approved' no painel (Table Editor → name_suggestions);
---   * saldo <= -2 esconde a sugestão sozinho; 'hidden' esconde de vez;
+--   * um nome aparece para todos assim que é sugerido (saldo de votos >= 1), ou quando
+--     você marca a sugestão como 'approved' no painel (Table Editor → name_suggestions);
+--   * com mais de um nome, vale o de maior saldo; saldo <= 0 tira do ar e <= -2 some
+--     da lista de votação; 'hidden' esconde de vez;
 --   * "remover meu nome" bloqueia a pessoa na hora (nenhum nome aparece e novas
 --     sugestões são recusadas). Para desfazer, apague a linha em blocked_people.
 
@@ -62,7 +63,7 @@ language sql stable security definer set search_path = public as $$
   select distinct on (s.person) s.person, s.name, s.score
   from suggestion_scores s
   where s.status <> 'hidden'
-    and (s.status = 'approved' or s.score >= 2)
+    and (s.status = 'approved' or s.score >= 1)
     and not exists (select 1 from blocked_people b where b.person = s.person)
   order by s.person, (s.status = 'approved') desc, s.score desc, s.created_at
 $$;
@@ -73,7 +74,7 @@ returns table (id bigint, name text, score int, my_vote smallint, visible boolea
 language sql stable security definer set search_path = public as $$
   select s.id, s.name, s.score,
          (select v.value from name_votes v where v.suggestion_id = s.id and v.client_id = p_client),
-         (s.status = 'approved' or s.score >= 2),
+         (s.status = 'approved' or s.score >= 1),
          false
   from suggestion_scores s
   where s.person = p_person and s.status <> 'hidden' and s.score > -2

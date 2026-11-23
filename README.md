@@ -31,7 +31,7 @@ Roda inteira no navegador (`site/selfie.js`, com onnxruntime-web): YuNet acha o 
 
 Os nomes ficam no Supabase (projeto `ydxndhawilxjvjrsdytu`); o esquema está em `supabase/schema.sql` (rodar no SQL Editor; é idempotente). As tabelas ficam fechadas e o site só usa funções: `get_names`, `get_suggestions`, `suggest_name`, `vote_name`, `request_removal`.
 
-- Um nome aparece para todos com saldo de votos >= 2 ou com `status = 'approved'`; saldo <= -2 esconde; `hidden` esconde de vez.
+- Um nome aparece para todos assim que é sugerido (saldo >= 1) ou com `status = 'approved'`; com vários nomes vale o de maior saldo; saldo <= 0 tira do ar; `hidden` esconde de vez.
 - "Sou eu e não quero meu nome aqui" grava em `blocked_people` e esconde na hora; apagar a linha desfaz.
 - Moderação: Table Editor → `name_suggestions`.
 - A pessoa 999 não existe na galeria: foi usada para testar e pode ser apagada das três tabelas.
